@@ -9,8 +9,11 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "jsdom": "^30.0.1",
+    "jsdom": "^26.0.0",
     "typescript": "^7.0.2",
-    "vitest": "^4.1.10"
+    "vitest": "^3.2.7"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
   }
 }
