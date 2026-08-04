@@ -36,3 +36,46 @@ export function validateBirth(birth: Date, today: Date): BirthValidation {
   if (ageInYears(birth, today) > MAX_AGE) return { ok: false, reason: 'too-old' }
   return { ok: true }
 }
+
+export interface LifeInput {
+  birth: Date
+  today: Date
+  expectancy?: number
+  parentAge?: number
+  meetingsPerYear?: number
+}
+
+export interface LifeStats {
+  age: number
+  weeksLived: number
+  totalWeeks: number
+  percent: number
+  blankWeeks: number
+  bonusWeeks: number
+  meetingsPerYear: number
+  parentMeetings: number | 'every-one-counts'
+  springFestivals: number
+  workdays: number | 'done'
+}
+
+export function computeStats(input: LifeInput): LifeStats {
+  const expectancy = input.expectancy ?? DEFAULT_EXPECTANCY
+  const meetingsPerYear = input.meetingsPerYear ?? DEFAULT_MEETINGS_PER_YEAR
+  const age = ageInYears(input.birth, input.today)
+  const lived = weeksLived(input.birth, input.today)
+  const total = totalWeeks(expectancy)
+  const parentAge = input.parentAge ?? age + 28
+  const parentYearsLeft = PARENT_EXPECTANCY - parentAge
+  return {
+    age,
+    weeksLived: lived,
+    totalWeeks: total,
+    percent: percentLived(input.birth, input.today, expectancy),
+    blankWeeks: Math.max(0, total - lived),
+    bonusWeeks: Math.max(0, lived - total),
+    meetingsPerYear,
+    parentMeetings: parentYearsLeft <= 0 ? 'every-one-counts' : parentYearsLeft * meetingsPerYear,
+    springFestivals: Math.max(0, expectancy - age),
+    workdays: age >= RETIREMENT_AGE ? 'done' : (RETIREMENT_AGE - age) * WORKDAYS_PER_YEAR,
+  }
+}

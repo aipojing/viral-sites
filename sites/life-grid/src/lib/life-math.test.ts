@@ -43,3 +43,42 @@ describe('validateBirth', () => {
     expect(validateBirth(d(1906, 8, 4), d(2026, 8, 4))).toEqual({ ok: true }))
   it('正常日期放行', () => expect(validateBirth(d(1990, 5, 1), d(2026, 8, 4))).toEqual({ ok: true }))
 })
+
+import { computeStats } from './life-math'
+
+describe('computeStats', () => {
+  const base = { birth: d(1996, 8, 4), today: d(2026, 8, 4) } // 恰好 30 岁
+
+  it('默认参数：父母年龄 = age+28，各字段口径正确', () => {
+    const s = computeStats(base)
+    expect(s.age).toBe(30)
+    expect(s.totalWeeks).toBe(4056)
+    expect(s.parentMeetings).toBe((78 - 58) * 2) // 40
+    expect(s.springFestivals).toBe(48) // 78-30
+    expect(s.workdays).toBe(7500) // (60-30)*250
+    expect(s.blankWeeks).toBe(s.totalWeeks - s.weeksLived)
+    expect(s.bonusWeeks).toBe(0)
+    expect(s.meetingsPerYear).toBe(2)
+  })
+
+  it('自定义见面频率参与计算', () => {
+    const s = computeStats({ ...base, parentAge: 60, meetingsPerYear: 4 })
+    expect(s.parentMeetings).toBe(72) // (78-60)*4
+  })
+
+  it('父母年龄 ≥ 78 → every-one-counts', () => {
+    expect(computeStats({ ...base, parentAge: 80 }).parentMeetings).toBe('every-one-counts')
+    expect(computeStats({ ...base, parentAge: 78 }).parentMeetings).toBe('every-one-counts')
+  })
+
+  it('年龄 ≥ 60 → workdays done', () => {
+    const s = computeStats({ birth: d(1960, 1, 1), today: d(2026, 8, 4) })
+    expect(s.workdays).toBe('done')
+  })
+
+  it('年龄 ≥ 预期寿命 → 彩蛋模式 bonusWeeks > 0 且 blankWeeks = 0', () => {
+    const s = computeStats({ birth: d(1940, 1, 1), today: d(2026, 8, 4), expectancy: 78 })
+    expect(s.bonusWeeks).toBeGreaterThan(0)
+    expect(s.blankWeeks).toBe(0)
+  })
+})
