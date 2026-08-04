@@ -9,9 +9,15 @@
       name="description"
       content="输入出生日期，把人生画成 4000 个格子：已经走过多少，还能见父母多少次，还剩多少个春节。所有计算在本地完成。"
     />
-    <!-- umami：部署后替换为真实 website-id 再上线
-    <script defer src="https://cloud.umami.is/script.js" data-website-id="TO_BE_FILLED"></script>
-    -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <!-- umami 自托管脚本 + 同源上报（data-host-url="/" → POST /api/send，由 _worker.js 代理转发），
+         保证大陆用户「站点打得开 = 统计一定通」 -->
+    <script
+      defer
+      src="/u.js"
+      data-website-id="58d73d6e-f796-4328-bb66-fd2a3f55af50"
+      data-host-url="/"
+    ></script>
   </head>
   <body>
     <div id="root"></div>
