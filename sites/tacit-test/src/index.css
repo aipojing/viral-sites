@@ -1,0 +1,46 @@
+@import 'tailwindcss';
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background-color: #fdfbf4;
+  background-image: radial-gradient(rgba(51, 48, 43, 0.05) 1px, transparent 1px);
+  background-size: 22px 22px;
+  color: #33302b;
+  font-family: -apple-system, 'PingFang SC', 'Noto Sans SC', system-ui, sans-serif;
+}
+
+.doodle-border {
+  border: 2px solid currentColor;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+}
+
+.sketch-dash {
+  border: 2px dashed currentColor;
+  border-radius: 12px 4px 14px 6px / 6px 12px 4px 14px;
+}
+
+.tilt-l {
+  transform: rotate(-0.8deg);
+}
+
+.tilt-r {
+  transform: rotate(0.7deg);
+}
+
+.pen-blue {
+  color: #2b59c3;
+}
+
+.pen-red {
+  color: #e0483a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
