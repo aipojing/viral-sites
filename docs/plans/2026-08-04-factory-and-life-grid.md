@@ -13,6 +13,7 @@
 （来自 [00-factory-design.md](../00-factory-design.md) 与 [01-life-grid.md](../01-life-grid.md)，所有任务默认遵守）
 
 - 首屏资源 gzip 后 < 100KB；不引入 UI 组件库、不引入日期库（原生 Date 够用）
+- 视觉遵循 [00a 风格分配表](../00a-style-map.md)：01 为「方格作业本」——纸白 `#f7f4ec` + 青蓝格线底、铅笔灰 `#8c8678`、墨色正文 `#3a3833`、批改朱红 `#c8392b` 只用于本周格/关键数字/主按钮
 - 埋点事件语义全站统一：`generate`（生成结果）、`save_image`（保存卡片）；visit 由 umami pageview 自带
 - 分享卡片固定 1080×1440（3:4）
 - 所有用户输入只在本地计算，绝不上传；埋点不带个人数据
@@ -626,7 +627,7 @@ import '@testing-library/jest-dom/vitest'
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#141414" />
+    <meta name="theme-color" content="#f7f4ec" />
     <title>人生进度条 — 你的人生还剩多少个星期</title>
     <meta
       name="description"
@@ -649,12 +650,17 @@ import '@testing-library/jest-dom/vitest'
 @import 'tailwindcss';
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
-  background-color: #141414;
-  color: #e8e4dc;
+  background-color: #f7f4ec;
+  /* 方格作业本：浅青蓝格线铺底，纯 CSS 不用图 */
+  background-image:
+    linear-gradient(to right, rgba(185, 205, 212, 0.35) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(185, 205, 212, 0.35) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: #3a3833;
   font-family: -apple-system, 'PingFang SC', 'Noto Sans SC', system-ui, sans-serif;
 }
 
@@ -1292,10 +1298,10 @@ import { useEffect, useRef } from 'react'
 import { GRID_COLS, layoutLifeGrid, type GridLayout } from '../lib/grid-layout'
 
 export const GRID_COLORS = {
-  bg: '#141414',
-  past: '#9c958a',
-  current: '#e8763a',
-  future: '#2e2c29',
+  bg: '#f7f4ec',
+  past: '#8c8678',
+  current: '#c8392b',
+  future: '#d9d2c0',
 } as const
 
 const GAP = 2
@@ -1378,7 +1384,7 @@ export function LifeGridCanvas({ weeksLived, totalWeeks }: Props) {
 
   return (
     <div className="w-full">
-      <p className="mb-2 text-xs text-[#9c958a]">一格是一个星期，这就是你的一生</p>
+      <p className="mb-2 text-xs text-[#8c8678]">一格是一个星期，这就是你的一生</p>
       <canvas ref={canvasRef} aria-label="人生格子图" />
     </div>
   )
@@ -1520,7 +1526,7 @@ export function InputScreen({ onSubmit, today }: Props) {
   return (
     <section className="flex flex-col gap-6">
       <h1 className="font-serif-cn text-3xl">人生进度条</h1>
-      <p className="text-sm text-[#9c958a]">
+      <p className="text-sm text-[#8c8678]">
         输入出生日期，看看你的人生还剩多少个格子。所有计算在本地完成，你的生日不会被上传。
       </p>
       <label className="flex flex-col gap-2 text-sm">
@@ -1529,12 +1535,12 @@ export function InputScreen({ onSubmit, today }: Props) {
           type="date"
           value={birthStr}
           onChange={(e) => setBirthStr(e.target.value)}
-          className="rounded-md border border-[#2e2c29] bg-transparent px-3 py-2"
+          className="rounded-md border border-[#d9d2c0] bg-transparent px-3 py-2"
         />
       </label>
-      {error && <p className="text-sm text-[#e8763a]">{error}</p>}
+      {error && <p className="text-sm text-[#c8392b]">{error}</p>}
       <details>
-        <summary className="cursor-pointer text-sm text-[#9c958a]">高级选项</summary>
+        <summary className="cursor-pointer text-sm text-[#8c8678]">高级选项</summary>
         <div className="mt-4 flex flex-col gap-4 text-sm">
           <label className="flex flex-col gap-2">
             预期寿命：{expectancy} 岁
@@ -1552,7 +1558,7 @@ export function InputScreen({ onSubmit, today }: Props) {
               type="number"
               value={parentAgeStr}
               onChange={(e) => setParentAgeStr(e.target.value)}
-              className="rounded-md border border-[#2e2c29] bg-transparent px-3 py-2"
+              className="rounded-md border border-[#d9d2c0] bg-transparent px-3 py-2"
             />
           </label>
           <label className="flex flex-col gap-2">
@@ -1561,7 +1567,7 @@ export function InputScreen({ onSubmit, today }: Props) {
               type="number"
               value={meetingsStr}
               onChange={(e) => setMeetingsStr(e.target.value)}
-              className="rounded-md border border-[#2e2c29] bg-transparent px-3 py-2"
+              className="rounded-md border border-[#d9d2c0] bg-transparent px-3 py-2"
             />
           </label>
         </div>
@@ -1569,7 +1575,7 @@ export function InputScreen({ onSubmit, today }: Props) {
       <button
         type="button"
         onClick={handleSubmit}
-        className="rounded-lg bg-[#e8763a] py-3 font-medium text-[#141414]"
+        className="rounded-lg bg-[#c8392b] py-3 font-medium text-[#f7f4ec]"
       >
         看看我的人生
       </button>
@@ -1689,7 +1695,7 @@ export function ResultScreen({ input, onRestart, children }: Props) {
       </ul>
       <div className="flex flex-col gap-3">
         {children}
-        <button type="button" onClick={onRestart} className="py-2 text-sm text-[#9c958a]">
+        <button type="button" onClick={onRestart} className="py-2 text-sm text-[#8c8678]">
           重新计算
         </button>
       </div>
@@ -1881,7 +1887,7 @@ export function makeLifeCardDraw(stats: LifeStats): DrawFn {
     ctx.fillRect(0, 0, size.width, size.height)
 
     ctx.textAlign = 'center'
-    ctx.fillStyle = '#e8e4dc'
+    ctx.fillStyle = '#3a3833'
     ctx.font = '600 56px "Songti SC", "Noto Serif SC", serif'
     ctx.fillText('我的人生进度条', size.width / 2, 120)
 
@@ -1907,11 +1913,11 @@ export function makeLifeCardDraw(stats: LifeStats): DrawFn {
     ctx.font = '700 120px -apple-system, sans-serif'
     ctx.fillText(`${stats.percent}%`, size.width / 2, gridBottom + 160)
 
-    ctx.fillStyle = '#e8e4dc'
+    ctx.fillStyle = '#3a3833'
     ctx.font = '400 40px -apple-system, sans-serif'
     ctx.fillText(pickCardLine(stats), size.width / 2, gridBottom + 240)
 
-    ctx.fillStyle = '#9c958a'
+    ctx.fillStyle = '#8c8678'
     ctx.font = '400 30px -apple-system, sans-serif'
     ctx.fillText(BRAND_TEXT, size.width / 2, size.height - 60)
   }
@@ -1934,7 +1940,7 @@ export function LongPressOverlay({ dataUrl, onClose }: Props) {
     >
       <img src={dataUrl} alt="人生卡片" className="max-h-[70vh] w-auto rounded-lg" />
       <p className="text-sm text-white">长按图片保存</p>
-      <p className="text-xs text-[#9c958a]">点击空白处关闭</p>
+      <p className="text-xs text-[#8c8678]">点击空白处关闭</p>
     </div>
   )
 }
@@ -1976,11 +1982,11 @@ export function SaveCardButton({ stats }: Props) {
       <button
         type="button"
         onClick={handleSave}
-        className="rounded-lg bg-[#e8763a] py-3 font-medium text-[#141414]"
+        className="rounded-lg bg-[#c8392b] py-3 font-medium text-[#f7f4ec]"
       >
         保存我的人生卡片
       </button>
-      {failed && <p className="text-sm text-[#9c958a]">保存失败了，直接截图也一样</p>}
+      {failed && <p className="text-sm text-[#8c8678]">保存失败了，直接截图也一样</p>}
       {overlayUrl && <LongPressOverlay dataUrl={overlayUrl} onClose={() => setOverlayUrl(null)} />}
     </>
   )
@@ -2088,7 +2094,7 @@ export function App() {
           </ResultScreen>
         )}
       </div>
-      <footer className="pt-10 text-center text-xs text-[#5a564f]">
+      <footer className="pt-10 text-center text-xs text-[#a29b8a]">
         所有计算在本地完成，你的生日不会被上传
       </footer>
     </main>

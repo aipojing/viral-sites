@@ -32,7 +32,7 @@
 | 12 | [网感年龄测试](docs/12-internet-age-test.md) | A | 测你的互联网精神年龄与成分（02 引擎换皮） |
 | 13~19 | [睡眠银行](docs/13-sleep-bank.md) · [道歉信](docs/14-apology-generator.md) · [按住不放](docs/15-hold-button.md) · [一秒钟世界](docs/16-one-second-world.md) · [亲戚称呼](docs/17-kinship-calculator.md) · [年度报告](docs/18-year-report.md) · [MBTI 日历](docs/19-mbti-calendar.md) | B | 简版设计，各自标注触发条件（节令/依赖/练手） |
 
-评级理由与淘汰区见 [docs/05-idea-pool.md](docs/05-idea-pool.md)。
+评级理由与淘汰区见 [docs/05-idea-pool.md](docs/05-idea-pool.md)；各站视觉风格分配（每站一种风格、一处签名元素）见 [docs/00a-style-map.md](docs/00a-style-map.md)。
 
 ## 技术栈（规划）
 
