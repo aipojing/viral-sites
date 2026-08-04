@@ -13,6 +13,8 @@ export {
 } from './phrase/template'
 export { phraseLibrarySchema, phraseSchema, type Phrase } from './phrase/schema'
 export { lintPhraseLibrary, type PhraseLintConfig, type PhraseLintIssue } from './phrase/lint'
+export { fnv1a } from './seeded/fnv1a'
+export { seededSequence, pickOne, pickN, type SeededSequence } from './seeded/sequence'
 export {
   parseTestConfig,
   type TestConfig,
