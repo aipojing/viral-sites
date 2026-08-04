@@ -19,7 +19,20 @@
 | 03 | [AI 赛博判官](docs/03-ai-judge.md) | 报上名来，AI 给你写一张毒舌判词 | 轻后端 + LLM | 📐 设计完成，第三发 |
 | 04 | [上班回本计算器](docs/04-salary-timer.md) | 实时跳动：这次带薪如厕价值 ¥3.2 | 纯前端 | 💤 备选池 |
 
-更多候选点子（含评级与淘汰理由）见 [docs/05-idea-pool.md](docs/05-idea-pool.md)，S 级候选：默契度测试、余生清单、赛博求签。
+### 候选池（已出设计文档，未排期）
+
+| # | 站点 | 评级 | 一句话 |
+|---|------|------|--------|
+| 06 | [默契度测试](docs/06-tacit-test.md) | S | 答 10 题生成链接发对方，链接被打开结果才存在——自带传播闭环 |
+| 07 | [余生清单](docs/07-bucket-list.md) | S | 勾选热爱的事，算出「还能吃 812 次火锅」清单卡 |
+| 08 | [赛博求签](docs/08-cyber-fortune.md) | S | 打工人电子黄历，每日一签，复访最强 |
+| 09 | [花光首富的钱](docs/09-spend-fortune.md) | A | 给你 3000 亿看你几分钟花完，购物清单卡 |
+| 10 | [放假倒计时](docs/10-holiday-countdown.md) | A | 距下个假期 X 天 + 调休真相 + 请假攻略 |
+| 11 | [拒绝话术生成器](docs/11-refusal-generator.md) | A | 选场景选语气，一键复制拒绝话术 |
+| 12 | [网感年龄测试](docs/12-internet-age-test.md) | A | 测你的互联网精神年龄与成分（02 引擎换皮） |
+| 13~19 | [睡眠银行](docs/13-sleep-bank.md) · [道歉信](docs/14-apology-generator.md) · [按住不放](docs/15-hold-button.md) · [一秒钟世界](docs/16-one-second-world.md) · [亲戚称呼](docs/17-kinship-calculator.md) · [年度报告](docs/18-year-report.md) · [MBTI 日历](docs/19-mbti-calendar.md) | B | 简版设计，各自标注触发条件（节令/依赖/练手） |
+
+评级理由与淘汰区见 [docs/05-idea-pool.md](docs/05-idea-pool.md)。
 
 ## 技术栈（规划）
 
