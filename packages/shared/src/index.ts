@@ -4,6 +4,16 @@ export { renderCard, CARD_SIZE, type CardSize, type DrawFn } from './share-card/
 export { saveCard, type SaveCardOptions } from './share-card/save-image'
 export { wrapByLength } from './share-card/text'
 export {
+  ADDRESSEE_MAX_LENGTH,
+  DEFAULT_ADDRESSEE,
+  PLACEHOLDER_ADDRESSEE,
+  hasAddresseePlaceholder,
+  normalizeAddressee,
+  renderTemplate,
+} from './phrase/template'
+export { phraseLibrarySchema, phraseSchema, type Phrase } from './phrase/schema'
+export { lintPhraseLibrary, type PhraseLintConfig, type PhraseLintIssue } from './phrase/lint'
+export {
   parseTestConfig,
   type TestConfig,
   type QuizQuestion,
