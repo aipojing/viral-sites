@@ -1,0 +1,92 @@
+@import 'tailwindcss';
+
+:root {
+  color-scheme: light;
+  --cf-paper: #f4e8cd;
+  --cf-paper-line: #e3d2ab;
+  --cf-ink: #2b2620;
+  --cf-ink-faded: #6f6353;
+  --cf-vermilion: #bc3a23;
+}
+
+body {
+  background-color: var(--cf-paper);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 30px,
+    rgba(227, 210, 171, 0.55) 30px 31px
+  );
+  color: var(--cf-ink);
+  font-family: -apple-system, 'PingFang SC', 'Noto Sans SC', system-ui, sans-serif;
+}
+
+.font-serif-cn {
+  font-family: 'Songti SC', 'Noto Serif SC', 'SimSun', serif;
+}
+
+.vertical-text {
+  writing-mode: vertical-rl;
+  letter-spacing: 0.18em;
+}
+
+.cf-tube {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 7rem;
+  height: 8rem;
+  border: 3px solid var(--cf-ink);
+  border-radius: 0 0 2.5rem 2.5rem;
+  background: var(--cf-paper);
+  color: var(--cf-vermilion);
+  box-shadow: inset 0 -10px 0 rgba(227, 210, 171, 0.7);
+}
+
+.cf-stick {
+  display: block;
+  width: 0.5rem;
+  height: 3.5rem;
+  border-radius: 0.25rem 0.25rem 0 0;
+  background: var(--cf-ink);
+}
+
+.cf-stick-tall {
+  height: 4.5rem;
+  background: var(--cf-vermilion);
+}
+
+.cf-fall-stick {
+  width: 0.5rem;
+  height: 4.5rem;
+  border-radius: 0.25rem;
+  background: var(--cf-vermilion);
+  animation: cf-fall 1.5s ease-in forwards;
+}
+
+.cf-stamp {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  border: 3px solid var(--cf-vermilion);
+  border-radius: 0.25rem;
+  color: var(--cf-vermilion);
+  font-weight: 700;
+  transform: rotate(-12deg);
+}
+
+@keyframes cf-shake {
+  0%, 100% { rotate: 0deg; }
+  25% { rotate: -3deg; }
+  75% { rotate: 3deg; }
+}
+
+@keyframes cf-fall {
+  from { transform: translateY(0) rotate(0deg); opacity: 1; }
+  to { transform: translateY(140px) rotate(18deg); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
