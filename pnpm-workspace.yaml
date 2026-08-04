@@ -1,3 +1,7 @@
 packages:
   - packages/*
   - sites/*
+onlyBuiltDependencies:
+  - esbuild
+allowBuilds:
+  esbuild: true

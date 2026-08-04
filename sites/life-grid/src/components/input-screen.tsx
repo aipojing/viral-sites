@@ -42,7 +42,7 @@ export function InputScreen({ onSubmit, today }: Props) {
     <section className="flex flex-col gap-6">
       <h1 className="font-serif-cn text-3xl">人生进度条</h1>
       <p className="text-sm text-[#8c8678]">
-        输入出生日期，看看你的人生还剩多少个格子。所有计算在本地完成，你的生日不会被上传。
+        输入出生日期，看看你的人生还剩多少个格子。
       </p>
       <label className="flex flex-col gap-2 text-sm">
         出生日期
