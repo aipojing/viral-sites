@@ -19,6 +19,8 @@
 | 03 | [AI 赛博判官](docs/03-ai-judge.md) | 报上名来，AI 给你写一张毒舌判词 | 轻后端 + LLM | 📐 设计完成，第三发 |
 | 04 | [上班回本计算器](docs/04-salary-timer.md) | 实时跳动：这次带薪如厕价值 ¥3.2 | 纯前端 | 💤 备选池 |
 
+更多候选点子（含评级与淘汰理由）见 [docs/05-idea-pool.md](docs/05-idea-pool.md)，S 级候选：默契度测试、余生清单、赛博求签。
+
 ## 技术栈（规划）
 
 - pnpm monorepo：`packages/shared`（卡片生成 / 埋点 / 基础 UI） + `sites/*`（每个点子一个站）
