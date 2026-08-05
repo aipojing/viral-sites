@@ -1,6 +1,6 @@
-import { parseTestConfig } from '@viral/shared'
+import { assertLinear, parseTestConfig } from '@viral/shared'
 
-export const banWeiConfig = parseTestConfig({
+const _raw = parseTestConfig({
   meta: {
     slug: 'ban-wei',
     title: '班味浓度检测',
@@ -141,3 +141,6 @@ export const banWeiConfig = parseTestConfig({
     ],
   },
 })
+
+assertLinear(_raw)
+export const banWeiConfig = _raw

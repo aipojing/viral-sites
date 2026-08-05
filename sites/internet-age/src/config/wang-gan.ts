@@ -1,6 +1,6 @@
-import { parseTestConfig } from '@viral/shared'
+import { assertTags, parseTestConfig } from '@viral/shared'
 
-export const wangGanConfig = parseTestConfig({
+const _raw = parseTestConfig({
   meta: {
     slug: 'wang-gan',
     title: '网感年龄测试',
@@ -150,3 +150,6 @@ export const wangGanConfig = parseTestConfig({
     ],
   },
 })
+
+assertTags(_raw)
+export const wangGanConfig = _raw

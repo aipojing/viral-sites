@@ -27,6 +27,7 @@ export {
 } from './quiz/schema'
 export {
   assertAnswers,
+  assertLinear,
   totalScore,
   scoreBounds,
   resolveTier,
@@ -35,6 +36,7 @@ export {
   type QuizResult,
 } from './quiz/scoring'
 export {
+  assertTags,
   aggregateTags,
   normalizeShares,
   mentalAgeOf,

@@ -6,7 +6,7 @@ const metaSchema = z.object({
   subtitle: z.string().min(1),
 })
 
-// ---------- linear（02 起的 v1 形状 + 可选 note） ----------
+// ---------- zod schemas（运行时校验） ----------
 
 export const quizOptionSchema = z.object({
   text: z.string().min(1),
@@ -55,8 +55,6 @@ export const linearTestConfigSchema = z
       }
     }
   })
-
-// ---------- tags（v2 新增：多维成分计分） ----------
 
 export const tagsOptionSchema = z.object({
   text: z.string().min(1),
@@ -114,37 +112,55 @@ export const tagsTestConfigSchema = z
     })
   })
 
-// ---------- 导出类型 ----------
-// TestConfig 使用宽松类型（所有属性可访问），保证 v1 测试无需改动即可编译。
-// LinearTestConfig / TagsTestConfig 是严格类型，v2 站点可在运行时守卫后安全使用。
+// ---------- 导出类型（判别联合） ----------
+// 使用 `never` 标记不存在于当前 variant 的属性，使 TypeScript 能通过
+// config.scoring.mode 做判别联合收窄；asserts 守卫提供编译期类型保护。
+
+type Meta = { slug: string; title: string; subtitle: string }
 
 export type QuizTier = z.infer<typeof quizTierSchema>
 export type QuizDimension = z.infer<typeof quizDimensionSchema>
 
-export type LinearTestConfig = z.infer<typeof linearTestConfigSchema>
-export type TagsTestConfig = z.infer<typeof tagsTestConfigSchema>
+type LinearOption = { text: string; score: number; tags?: never }
+type TagsOption = { text: string; score?: never; tags: Record<string, number> }
+export type QuizOption = LinearOption | TagsOption
 
-export type TestConfig = {
-  meta: { slug: string; title: string; subtitle: string }
-  questions: Array<{
-    text: string
-    note?: string
-    options: Array<{
-      text: string
-      score: number
-      tags?: Record<string, number>
-    }>
-  }>
-  scoring: {
-    mode: 'linear' | 'tags'
-    tiers: QuizTier[]
-    dimensions: QuizDimension[]
-    ageJitterSpan: number
-  }
+type LinearQuestion = {
+  text: string
+  note?: string
+  options: LinearOption[]
+}
+type TagsQuestion = {
+  text: string
+  note?: string
+  options: TagsOption[]
+}
+export type QuizQuestion = LinearQuestion | TagsQuestion
+
+type LinearScoring = {
+  mode: 'linear'
+  tiers: QuizTier[]
+  dimensions?: never
+  ageJitterSpan?: never
+}
+type TagsScoring = {
+  mode: 'tags'
+  tiers?: never
+  dimensions: QuizDimension[]
+  ageJitterSpan: number
 }
 
-export type QuizQuestion = TestConfig['questions'][number]
-export type QuizOption = TestConfig['questions'][number]['options'][number]
+export type LinearTestConfig = {
+  meta: Meta
+  questions: LinearQuestion[]
+  scoring: LinearScoring
+}
+export type TagsTestConfig = {
+  meta: Meta
+  questions: TagsQuestion[]
+  scoring: TagsScoring
+}
+export type TestConfig = LinearTestConfig | TagsTestConfig
 
 export function parseTestConfig(raw: unknown): TestConfig {
   const mode =
