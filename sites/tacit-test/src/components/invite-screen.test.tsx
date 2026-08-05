@@ -8,10 +8,10 @@ const PAYLOAD: ChallengePayload = { v: 1, q: 'friend', n: '阿福', a: Array(10)
 const URL = 'https://tacit-test.pages.dev/c?d=abc'
 
 describe('InviteScreen', () => {
-  it('渲染复制按钮与保存发起卡按钮', () => {
+  it('渲染复制按钮与保存可扫码挑战卡按钮', () => {
     render(<InviteScreen payload={PAYLOAD} url={URL} />)
     expect(screen.getByRole('button', { name: '复制挑战链接' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '保存挑战发起卡' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '保存可扫码挑战卡' })).toBeInTheDocument()
   })
 
   it('展示发起方答题风格锐评（兜底产出）', () => {
