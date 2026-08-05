@@ -8,10 +8,6 @@ const base: QuoteCardData = {
   sceneId: 'jieqian',
   sceneLabel: '被借钱',
   sceneColor: '#0d9488',
-  sceneIndex: 0,
-  allSceneColors: [
-    '#0d9488', '#ea580c', '#db2777', '#2563eb', '#7c3aed', '#dc2626', '#d97706', '#16a34a',
-  ],
   toneId: 'yinggang',
   toneLabel: '直球硬刚',
 }
@@ -53,10 +49,19 @@ describe('makeQuoteCardDraw · Bento 标准皮（weiwan/yinggang/heihua）', () 
     expect(texts.some((t) => t.includes('被借钱'))).toBe(true)
     expect(texts.some((t) => t.includes('拒绝话术生成器'))).toBe(true)
   })
-  it('九格色块条上卡：fillRect ≥ 12 次（背景+卡面+色条+9 小格）', () => {
+  it('标准皮只画背景、正文卡和场景色条，不画九格调色板', () => {
     const ctx = fakeCtx()
     makeQuoteCardDraw(base)(ctx, SIZE)
-    expect((ctx.fillRect as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThanOrEqual(12)
+    const calls = (ctx.fillRect as ReturnType<typeof vi.fn>).mock.calls
+    expect(calls.length).toBeLessThan(10)
+  })
+  it('短正文也垂直落在卡片视觉中心区域', () => {
+    const ctx = fakeCtx()
+    makeQuoteCardDraw({ ...base, text: '不借。' })(ctx, SIZE)
+    const bodyCall = (ctx.fillText as ReturnType<typeof vi.fn>).mock.calls
+      .find(([text]) => text === '不借。')
+    expect(bodyCall?.[2]).toBeGreaterThanOrEqual(620)
+    expect(bodyCall?.[2]).toBeLessThanOrEqual(900)
   })
 })
 
