@@ -25,4 +25,12 @@ describe('TonePicker', () => {
       'true',
     )
   })
+
+  it('使用两行网格，不依赖横向滚动发现第五项', () => {
+    render(<TonePicker selected={null} onSelect={() => {}} />)
+    const group = screen.getByRole('group', { name: '选择语气' })
+    expect(group.className).toContain('grid')
+    expect(group.className).toContain('grid-cols-3')
+    expect(group.className).not.toContain('overflow-x-auto')
+  })
 })

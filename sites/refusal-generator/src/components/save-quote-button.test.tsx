@@ -10,8 +10,6 @@ const data: QuoteCardData = {
   sceneId: 'jieqian',
   sceneLabel: '被借钱',
   sceneColor: '#0d9488',
-  sceneIndex: 0,
-  allSceneColors: ['#0d9488', '#ea580c'],
   toneId: 'yinggang',
   toneLabel: '直球硬刚',
 }

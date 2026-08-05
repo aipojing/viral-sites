@@ -5,8 +5,6 @@ export interface QuoteCardData {
   sceneId: string
   sceneLabel: string
   sceneColor: string
-  sceneIndex: number
-  allSceneColors: readonly string[]
   toneId: string
   toneLabel: string
 }
@@ -39,30 +37,16 @@ export function wrapByLength(text: string, charsPerLine: number): string[] {
   return lines
 }
 
-function drawBrandStrip(
+function drawBrand(
   ctx: CanvasRenderingContext2D,
   size: CardSize,
-  data: QuoteCardData,
   textColor: string,
 ) {
-  const tile = 28
-  const gap = 10
-  const colors = [...data.allSceneColors, CARD_COLORS.ink]
-  const totalWidth = colors.length * (tile + gap) - gap
-  const x0 = (size.width - totalWidth) / 2
-  const y = size.height - 150
-  colors.forEach((color, i) => {
-    const active = i === data.sceneIndex
-    ctx.globalAlpha = active ? 1 : 0.3
-    ctx.fillStyle = color
-    const h = active ? tile + 10 : tile
-    ctx.fillRect(x0 + i * (tile + gap), y - (h - tile), tile, h)
-  })
   ctx.globalAlpha = 1
   ctx.fillStyle = textColor
   ctx.font = `400 30px ${SANS}`
   ctx.textAlign = 'center'
-  ctx.fillText(BRAND_TEXT, size.width / 2, size.height - 60)
+  ctx.fillText(BRAND_TEXT, size.width / 2, size.height - 70)
 }
 
 function drawStandardSkin(ctx: CanvasRenderingContext2D, size: CardSize, data: QuoteCardData) {
@@ -80,10 +64,14 @@ function drawStandardSkin(ctx: CanvasRenderingContext2D, size: CardSize, data: Q
   ctx.font = `700 64px ${SANS}`
   ctx.fillText('今日拒绝语录', 150, 380)
   ctx.font = `500 56px ${SANS}`
-  wrapByLength(data.text, 13).forEach((line, i) => {
-    ctx.fillText(line, 150, 520 + i * 88)
+  const lines = wrapByLength(data.text, 13)
+  const lineHeight = 88
+  const bodyCenterY = 760
+  const firstBaseline = bodyCenterY - ((lines.length - 1) * lineHeight) / 2
+  lines.forEach((line, index) => {
+    ctx.fillText(line, 150, firstBaseline + index * lineHeight)
   })
-  drawBrandStrip(ctx, size, data, CARD_COLORS.subtle)
+  drawBrand(ctx, size, CARD_COLORS.subtle)
 }
 
 function drawClassicalSkin(ctx: CanvasRenderingContext2D, size: CardSize, data: QuoteCardData) {
@@ -112,7 +100,7 @@ function drawClassicalSkin(ctx: CanvasRenderingContext2D, size: CardSize, data: 
   ctx.fillStyle = CARD_COLORS.paperInk
   ctx.font = `400 34px ${SERIF}`
   ctx.fillText(`${data.sceneLabel} · ${data.toneLabel}`, size.width / 2, size.height - 190)
-  drawBrandStrip(ctx, size, data, CARD_COLORS.paperInk)
+  drawBrand(ctx, size, CARD_COLORS.paperInk)
 }
 
 function drawUnhingedSkin(ctx: CanvasRenderingContext2D, size: CardSize, data: QuoteCardData) {
@@ -138,7 +126,7 @@ function drawUnhingedSkin(ctx: CanvasRenderingContext2D, size: CardSize, data: Q
   ctx.fillStyle = CARD_COLORS.memeBg
   ctx.font = `700 40px ${SANS}`
   ctx.fillText(`${data.sceneLabel} × ${data.toneLabel}`, 100, size.height - 222)
-  drawBrandStrip(ctx, size, data, CARD_COLORS.memeInk)
+  drawBrand(ctx, size, CARD_COLORS.memeInk)
 }
 
 export function makeQuoteCardDraw(data: QuoteCardData): DrawFn {

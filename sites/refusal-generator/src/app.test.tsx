@@ -73,4 +73,21 @@ describe('App', () => {
     expect(screen.getByText(/话术仅供参考/)).toBeInTheDocument()
     expect(screen.getByText(/不上传任何数据/)).toBeInTheDocument()
   })
+
+  it('自定义场景：站内输入 → 选语气 → 得到 3 条本地话术', async () => {
+    render(<App />)
+    await userEvent.click(screen.getByRole('button', { name: /自己输入/ }))
+    await userEvent.type(
+      screen.getByLabelText('描述你想拒绝的具体事情'),
+      '同事让我替他背锅',
+    )
+    await userEvent.click(screen.getByRole('button', { name: '继续选语气' }))
+    await userEvent.click(screen.getByRole('button', { name: '委婉体面' }))
+
+    expect(screen.getAllByRole('button', { name: '复制' })).toHaveLength(3)
+    expect(screen.getAllByText(/同事让我替他背锅/).length).toBeGreaterThan(0)
+    expect(umamiSpy).toHaveBeenCalledWith('custom_scene_opened', { mode: 'local' })
+    expect(umamiSpy).toHaveBeenCalledWith('custom_scene_submitted', { mode: 'local' })
+    expect(JSON.stringify(umamiSpy.mock.calls)).not.toContain('同事让我替他背锅')
+  })
 })

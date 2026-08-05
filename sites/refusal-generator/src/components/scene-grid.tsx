@@ -1,15 +1,12 @@
 import { SCENES } from '../configs/scenes'
 
-const WISH_MAILTO = `mailto:afu886.cn@gmail.com?subject=${encodeURIComponent(
-  '【拒绝话术许愿】我想拒绝…',
-)}`
-
 interface Props {
   selected: string | null
   onSelect: (sceneId: string) => void
+  onCustomSelect: () => void
 }
 
-export function SceneGrid({ selected, onSelect }: Props) {
+export function SceneGrid({ selected, onSelect, onCustomSelect }: Props) {
   return (
     <div className="grid grid-cols-3 gap-3" role="group" aria-label="选择场景">
       {SCENES.map((scene) => (
@@ -33,13 +30,15 @@ export function SceneGrid({ selected, onSelect }: Props) {
           </span>
         </button>
       ))}
-      <a
-        href={WISH_MAILTO}
-        className="flex min-h-24 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#9ca3af] p-4 text-center text-xs text-[#6b7280]"
+      <button
+        type="button"
+        aria-pressed={selected === 'custom'}
+        onClick={onCustomSelect}
+        className="flex min-h-24 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#9ca3af] p-4 text-center text-xs text-[#606774]"
       >
-        想拒绝别的？
-        <span className="mt-1 font-medium">写信告诉我</span>
-      </a>
+        没有你的场景？
+        <span className="mt-1 font-medium">自己输入</span>
+      </button>
     </div>
   )
 }
