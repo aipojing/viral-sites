@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { loadNickname } from '../lib/storage'
 
 const CHARGE_FULL_MS = 1200
@@ -59,11 +59,25 @@ export function DrawScreen({ onDraw }: Props) {
     window.setTimeout(() => onDraw(nickname.trim()), wait)
   }
 
+  const isActivationKey = (key: string) => key === 'Enter' || key === ' '
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (!isActivationKey(event.key) || event.repeat) return
+    event.preventDefault()
+    startCharge()
+  }
+
+  const handleKeyUp = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (!isActivationKey(event.key)) return
+    event.preventDefault()
+    release()
+  }
+
   return (
     <section className="flex flex-col items-center gap-6">
       <h1 className="font-serif-cn text-3xl">赛博求签</h1>
       <p className="text-center text-sm" style={{ color: 'var(--cf-ink-faded)' }}>
-        打工人电子黄历。长按签筒蓄力，松手掉签——同名同天，签必相同。
+        打工人电子黄历。同名同天，签必相同。
       </p>
       <label className="flex w-full flex-col gap-2 text-sm">
         怎么称呼你
@@ -89,6 +103,10 @@ export function DrawScreen({ onDraw }: Props) {
         onPointerDown={startCharge}
         onPointerUp={release}
         onPointerLeave={release}
+        onPointerCancel={release}
+        onKeyDown={handleKeyDown}
+        onKeyUp={handleKeyUp}
+        aria-describedby="fortune-draw-hint"
         className="relative flex touch-none select-none flex-col items-center pt-10"
         style={
           phase === 'charging'
@@ -107,8 +125,8 @@ export function DrawScreen({ onDraw }: Props) {
         <span className="cf-tube font-serif-cn text-3xl">签</span>
       </button>
       {phase === 'falling' && <div aria-hidden className="cf-fall-stick" />}
-      <p className="text-xs" style={{ color: 'var(--cf-ink-faded)' }}>
-        按住签筒蓄力，松手掉签
+      <p id="fortune-draw-hint" className="text-xs" style={{ color: 'var(--cf-ink-faded)' }}>
+        长按签筒蓄力；也可用 Enter 或空格键求签
       </p>
     </section>
   )

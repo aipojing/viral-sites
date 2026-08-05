@@ -80,4 +80,19 @@ describe('DrawScreen', () => {
     })
     expect(onDraw).toHaveBeenCalledTimes(1)
   })
+
+  it.each(['Enter', ' '])('键盘 %s 可以完成求签', (key) => {
+    const onDraw = vi.fn()
+    render(<DrawScreen onDraw={onDraw} />)
+    fireEvent.change(screen.getByLabelText('怎么称呼你'), { target: { value: '阿福' } })
+    const tube = screen.getByRole('button', { name: '签筒' })
+
+    fireEvent.keyDown(tube, { key })
+    expect(tube).toHaveAttribute('data-phase', 'charging')
+    fireEvent.keyUp(tube, { key })
+    expect(tube).toHaveAttribute('data-phase', 'falling')
+
+    act(() => vi.advanceTimersByTime(1500))
+    expect(onDraw).toHaveBeenCalledExactlyOnceWith('阿福')
+  })
 })
