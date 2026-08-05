@@ -18,9 +18,12 @@ export { seededSequence, pickOne, pickN, type SeededSequence } from './seeded/se
 export {
   parseTestConfig,
   type TestConfig,
+  type LinearTestConfig,
+  type TagsTestConfig,
   type QuizQuestion,
   type QuizOption,
   type QuizTier,
+  type QuizDimension,
 } from './quiz/schema'
 export {
   assertAnswers,
@@ -31,3 +34,11 @@ export {
   computeResult,
   type QuizResult,
 } from './quiz/scoring'
+export {
+  aggregateTags,
+  normalizeShares,
+  mentalAgeOf,
+  computeTagsResult,
+  type TagShare,
+  type TagsResult,
+} from './quiz/tags'
