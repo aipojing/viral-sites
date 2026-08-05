@@ -2,15 +2,16 @@ import { vi } from 'vitest'
 
 export interface RecordingCtx {
   fillRect: ReturnType<typeof vi.fn>
+  strokeRect: ReturnType<typeof vi.fn>
   fillText: ReturnType<typeof vi.fn>
   clearRect: ReturnType<typeof vi.fn>
-  strokeRect: ReturnType<typeof vi.fn>
-  scale: ReturnType<typeof vi.fn>
+  createLinearGradient: ReturnType<typeof vi.fn>
   save: ReturnType<typeof vi.fn>
   restore: ReturnType<typeof vi.fn>
   translate: ReturnType<typeof vi.fn>
   rotate: ReturnType<typeof vi.fn>
-  fillStyle: string
+  scale: ReturnType<typeof vi.fn>
+  fillStyle: unknown
   strokeStyle: string
   lineWidth: number
   globalAlpha: number
@@ -18,17 +19,18 @@ export interface RecordingCtx {
   textAlign: string
 }
 
-export function makeRecordingCtx(): RecordingCtx {
-  return {
+export function installCanvasStub(): RecordingCtx {
+  const ctx: RecordingCtx = {
     fillRect: vi.fn(),
+    strokeRect: vi.fn(),
     fillText: vi.fn(),
     clearRect: vi.fn(),
-    strokeRect: vi.fn(),
-    scale: vi.fn(),
+    createLinearGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
     save: vi.fn(),
     restore: vi.fn(),
     translate: vi.fn(),
     rotate: vi.fn(),
+    scale: vi.fn(),
     fillStyle: '',
     strokeStyle: '',
     lineWidth: 1,
@@ -36,10 +38,6 @@ export function makeRecordingCtx(): RecordingCtx {
     font: '',
     textAlign: 'left',
   }
-}
-
-export function installCanvasStub(): RecordingCtx {
-  const ctx = makeRecordingCtx()
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(ctx as never)
   return ctx
 }
