@@ -41,7 +41,7 @@ export function InputScreen({ onSubmit, today }: Props) {
   return (
     <section className="flex flex-col gap-6">
       <h1 className="font-serif-cn text-3xl">人生进度条</h1>
-      <p className="text-sm text-[#8c8678]">
+      <p className="text-sm text-[#6d675b]">
         输入出生日期，看看你的人生还剩多少个格子。
       </p>
       <label className="flex flex-col gap-2 text-sm">
@@ -55,7 +55,7 @@ export function InputScreen({ onSubmit, today }: Props) {
       </label>
       {error && <p className="text-sm text-[#c8392b]">{error}</p>}
       <details>
-        <summary className="cursor-pointer text-sm text-[#8c8678]">高级选项</summary>
+        <summary className="cursor-pointer text-sm text-[#6d675b]">高级选项</summary>
         <div className="mt-4 flex flex-col gap-4 text-sm">
           <label className="flex flex-col gap-2">
             预期寿命：{expectancy} 岁

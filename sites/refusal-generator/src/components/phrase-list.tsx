@@ -72,12 +72,12 @@ export function PhraseList({ phrases, scene, tone, renderSaveAction }: Props) {
           )
         })}
       </ul>
-      {copyFailed && <p className="text-xs text-[#6b7280]">复制失败了，长按文字也能复制</p>}
+      {copyFailed && <p className="text-xs text-[#606774]">复制失败了，长按文字也能复制</p>}
       {phrases.length > BATCH_SIZE && (
         <button
           type="button"
           onClick={() => setBatchIndex((i) => i + 1)}
-          className="py-2 text-sm text-[#6b7280]"
+          className="py-2 text-sm text-[#606774]"
         >
           换一批
         </button>

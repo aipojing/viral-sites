@@ -11,7 +11,7 @@ export function LongPressOverlay({ dataUrl, onClose }: Props) {
     >
       <img src={dataUrl} alt="人生卡片" className="max-h-[70vh] w-auto rounded-lg" />
       <p className="text-sm text-white">长按图片保存</p>
-      <p className="text-xs text-[#8c8678]">点击空白处关闭</p>
+      <p className="text-xs text-[#6d675b]">点击空白处关闭</p>
     </div>
   )
 }

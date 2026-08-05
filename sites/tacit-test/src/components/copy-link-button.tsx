@@ -33,7 +33,7 @@ export function CopyLinkButton({ url }: Props) {
             onFocus={(e) => e.target.select()}
             className="sketch-dash bg-transparent px-3 py-2 text-xs text-[#33302b]"
           />
-          <p className="text-xs text-[#9b948a]">自动复制被拦下了，长按上面这行手动复制</p>
+          <p className="text-xs text-[#6f6a62]">自动复制被拦下了，长按上面这行手动复制</p>
         </>
       )}
     </div>

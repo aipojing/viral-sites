@@ -26,7 +26,7 @@ export function App() {
           </ResultScreen>
         )}
       </div>
-      <footer className="pt-10 text-center text-xs text-[#a29b8a]">
+      <footer className="pt-10 text-center text-xs text-[#6d675b]">
         所有计算在本地完成，你的生日不会被上传
       </footer>
     </main>

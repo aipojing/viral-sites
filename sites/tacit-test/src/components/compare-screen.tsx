@@ -28,7 +28,7 @@ export function CompareScreen({ payload, challengerName, challengerAnswers, onRe
           {score}%
         </p>
         <p className="text-2xl font-bold">{tier.title}</p>
-        <p className="text-sm text-[#9b948a]">{tier.remark}</p>
+        <p className="text-sm text-[#6f6a62]">{tier.remark}</p>
       </header>
 
       <ul className="flex flex-col gap-3">
@@ -71,7 +71,7 @@ export function CompareScreen({ payload, challengerName, challengerAnswers, onRe
           label="保存默契对比卡"
           cardId="compare"
         />
-        <button type="button" onClick={onRestart} className="py-2 text-sm text-[#9b948a]">
+        <button type="button" onClick={onRestart} className="py-2 text-sm text-[#6f6a62]">
           我也要发起一个
         </button>
       </div>

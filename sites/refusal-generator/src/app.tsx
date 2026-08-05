@@ -56,7 +56,7 @@ export function App() {
     <main className="mx-auto flex min-h-dvh max-w-md flex-col px-5 py-8">
       <header className="mb-6">
         <h1 className="text-2xl font-bold">拒绝话术生成器</h1>
-        <p className="mt-1 text-sm text-[#6b7280]">选场景、挑语气，一键复制，好好说「不」。</p>
+        <p className="mt-1 text-sm text-[#606774]">选场景、挑语气，一键复制，好好说「不」。</p>
       </header>
       <div className="flex flex-1 flex-col gap-6">
         <SceneGrid selected={sceneId} onSelect={handleSceneSelect} onCustomSelect={handleCustomSelect} />

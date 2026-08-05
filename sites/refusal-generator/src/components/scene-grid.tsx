@@ -34,7 +34,7 @@ export function SceneGrid({ selected, onSelect, onCustomSelect }: Props) {
         type="button"
         aria-pressed={selected === 'custom'}
         onClick={onCustomSelect}
-        className="flex min-h-24 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#9ca3af] p-4 text-center text-xs text-[#606774]"
+        className="flex min-h-24 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#606774] p-4 text-center text-xs text-[#606774]"
       >
         没有你的场景？
         <span className="mt-1 font-medium">自己输入</span>

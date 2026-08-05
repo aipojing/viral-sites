@@ -33,7 +33,7 @@ export function SaveCardButton({ draw, filename, label, cardId }: Props) {
       >
         {label}
       </button>
-      {failed && <p className="text-sm text-[#9b948a]">保存失败了，直接截图也一样</p>}
+      {failed && <p className="text-sm text-[#6f6a62]">保存失败了，直接截图也一样</p>}
       {overlayUrl && <LongPressOverlay dataUrl={overlayUrl} onClose={() => setOverlayUrl(null)} />}
     </>
   )

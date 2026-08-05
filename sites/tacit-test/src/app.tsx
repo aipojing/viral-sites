@@ -123,7 +123,7 @@ export function App({ search = window.location.search }: Props) {
           />
         )}
       </div>
-      <footer className="pt-10 text-center text-xs text-[#9b948a]">
+      <footer className="pt-10 text-center text-xs text-[#6f6a62]">
         答案随挑战链接传递，请只发给你信任的人；本站不保存挑战内容
       </footer>
     </main>

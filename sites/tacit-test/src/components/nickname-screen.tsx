@@ -24,7 +24,7 @@ export function NicknameScreen({ heading, sub, buttonLabel, onSubmit }: Props) {
   return (
     <section className="flex flex-col gap-6">
       <h1 className="text-3xl font-bold">{heading}</h1>
-      <p className="text-sm text-[#9b948a]">{sub}</p>
+      <p className="text-sm text-[#6f6a62]">{sub}</p>
       <label className="flex flex-col gap-2 text-sm">
         你的昵称
         <input

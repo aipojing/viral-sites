@@ -35,7 +35,7 @@ export function SaveCardButton({ stats }: Props) {
       >
         保存我的人生卡片
       </button>
-      {failed && <p className="text-sm text-[#8c8678]">保存失败了，直接截图也一样</p>}
+      {failed && <p className="text-sm text-[#6d675b]">保存失败了，直接截图也一样</p>}
       {overlayUrl && <LongPressOverlay dataUrl={overlayUrl} onClose={() => setOverlayUrl(null)} />}
     </>
   )
