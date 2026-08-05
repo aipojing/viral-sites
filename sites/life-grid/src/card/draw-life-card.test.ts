@@ -43,4 +43,21 @@ describe('makeLifeCardDraw', () => {
     expect(texts.some((t: string) => t.includes('人生进度条'))).toBe(true)
     expect(texts.some((t: string) => t.includes('38.6%'))).toBe(true)
   })
+
+  it('全部格子与关键文字都落在 1080×1440 画布内', () => {
+    const ctx = fakeCtx()
+    makeLifeCardDraw(stats)(ctx, { width: 1080, height: 1440 })
+
+    for (const [x, y, width, height] of (ctx.fillRect as ReturnType<typeof vi.fn>).mock.calls) {
+      expect(x).toBeGreaterThanOrEqual(0)
+      expect(y).toBeGreaterThanOrEqual(0)
+      expect(x + width).toBeLessThanOrEqual(1080)
+      expect(y + height).toBeLessThanOrEqual(1440)
+    }
+
+    const texts = (ctx.fillText as ReturnType<typeof vi.fn>).mock.calls
+    expect(texts.some(([text]) => String(text) === '38.6%')).toBe(true)
+    expect(texts.some(([text]) => String(text).includes('还能见父母'))).toBe(true)
+    expect(texts.every(([, , y]) => Number(y) >= 0 && Number(y) <= 1440)).toBe(true)
+  })
 })

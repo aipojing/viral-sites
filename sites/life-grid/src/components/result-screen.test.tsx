@@ -42,4 +42,21 @@ describe('ResultScreen', () => {
     screen.getByRole('button', { name: '重新计算' }).click()
     expect(onRestart).toHaveBeenCalled()
   })
+
+  it('关键百分比在格子图之前，首屏先给结论', () => {
+    render(<ResultScreen input={INPUT} onRestart={() => {}} />)
+    const summary = screen.getByTestId('life-summary')
+    const grid = screen.getByLabelText('人生格子图')
+    expect(summary).toHaveTextContent(/你的人生已经走过/)
+    expect(summary).toHaveTextContent(/%/)
+    expect(summary.compareDocumentPosition(grid) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('摘要只突出百分比、见父母次数和春节数', () => {
+    render(<ResultScreen input={INPUT} onRestart={() => {}} />)
+    const summary = screen.getByTestId('life-summary')
+    expect(summary).toHaveTextContent(/还能见父母大约/)
+    expect(summary).toHaveTextContent(/个春节/)
+    expect(summary).not.toHaveTextContent(/工作日/)
+  })
 })
