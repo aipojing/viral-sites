@@ -1,0 +1,21 @@
+@import 'tailwindcss';
+@source '.';
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background-color: #faf6ee;
+  background-image: radial-gradient(rgba(64, 49, 34, 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: #37302a;
+  font-family: -apple-system, 'PingFang SC', 'Noto Sans SC', system-ui, sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
