@@ -1,5 +1,10 @@
+import { useState } from 'react'
+import { track } from '@viral/shared'
 import type { ChainEntry, PublicChain, Slot } from '../../worker/types'
 import { buildPublicChainUrl } from '../lib/chain-url'
+import { shareOrCopy } from '../lib/share'
+import { makeResultCardDraw } from '../card/draw-result-card'
+import { SaveCardButton } from './save-card-button'
 
 function entryOf(chain: PublicChain, slot: Slot): ChainEntry | undefined {
   return chain.entries.find((entry) => entry.slot === slot)
@@ -35,6 +40,7 @@ function AnswerBlock({ entry, answerer }: { entry?: ChainEntry; answerer: Slot }
 
 export function ResultScreen({ chain }: { chain: PublicChain }) {
   const publicUrl = buildPublicChainUrl(window.location.origin, chain.slug)
+  const [shared, setShared] = useState(false)
   const startDate = new Date(chain.createdAt).toLocaleDateString('zh-CN', {
     year: 'numeric',
     month: '2-digit',
@@ -45,6 +51,16 @@ export function ResultScreen({ chain }: { chain: PublicChain }) {
     month: '2-digit',
     day: '2-digit',
   })
+
+  async function handleShare() {
+    const method = await shareOrCopy({
+      title: '下一问 · 闭环结果',
+      text: '一个问题走过六个人，又回到了起点',
+      url: publicUrl,
+    })
+    setShared(true)
+    track('share', { mode: method })
+  }
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-xl flex-col px-6 pb-12 pt-16">
@@ -73,6 +89,24 @@ export function ResultScreen({ chain }: { chain: PublicChain }) {
       <section className="mt-8 rounded-2xl border border-dashed border-stone-300 bg-white/85 p-5">
         <p className="text-sm text-stone-600">把这条完整的问答分享给链条上的人：</p>
         <p className="mt-2 break-all rounded-lg bg-stone-100 px-3 py-2 text-xs text-stone-500">{publicUrl}</p>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={handleShare}
+            className="min-h-12 rounded-full bg-[#e63b2e] px-6 text-base font-semibold text-white shadow-[0_3px_0_#a32418] transition-transform hover:-translate-y-0.5 active:translate-y-0"
+          >
+            分享结果页
+          </button>
+          <SaveCardButton
+            draw={makeResultCardDraw(chain, publicUrl)}
+            filename="next-question-result.png"
+            label="保存结果卡"
+            kind="result"
+          />
+        </div>
+        <p className="mt-3 text-xs text-stone-500" role="status">
+          {shared ? '结果页链接已就绪。' : '结果卡只放摘录，完整问答留在网页里。'}
+        </p>
       </section>
     </main>
   )

@@ -1,6 +1,9 @@
 import { useState, type FormEvent } from 'react'
+import { track } from '@viral/shared'
 import type { ChainEntry, PublicChain } from '../../worker/types'
 import { ANSWER_MAX_CODE_POINTS, codePointLength } from '../../worker/validation'
+import { buildPublicChainUrl } from '../lib/chain-url'
+import { shareOrCopy } from '../lib/share'
 import { CountedField } from './counted-field'
 import { errorMessageOf } from './error-messages'
 
@@ -68,8 +71,20 @@ export function ProgressScreen({
   const [error, setError] = useState<string | null>(null)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [shared, setShared] = useState(false)
 
   const entryOf = (slot: number) => chain.entries.find((entry) => entry.slot === slot)
+  const publicUrl = buildPublicChainUrl(window.location.origin, chain.slug)
+
+  async function handleShareProgress() {
+    const method = await shareOrCopy({
+      title: '下一问 · 接力进度',
+      text: '一个问题正在六个人之间接力',
+      url: publicUrl,
+    })
+    setShared(true)
+    track('share', { mode: method })
+  }
 
   async function handleClose(event: FormEvent) {
     event.preventDefault()
@@ -124,6 +139,19 @@ export function ProgressScreen({
           />
         ))}
       </ol>
+
+      <section className="mt-6 flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={handleShareProgress}
+          className="min-h-12 rounded-full border border-stone-300 px-5 text-sm text-stone-600 hover:border-stone-400"
+        >
+          分享进度页
+        </button>
+        <span className="text-xs text-stone-500" role="status">
+          {shared ? '进度链接已就绪，去发给关心这条接力的人。' : '进度页是只读链接，不含任何接力棒。'}
+        </span>
+      </section>
 
       {chain.status === 'returned' && onClose ? (
         <form onSubmit={handleClose} noValidate className="mt-8 flex flex-col gap-4 rounded-2xl border border-stone-200 bg-white/85 p-6">

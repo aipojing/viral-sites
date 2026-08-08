@@ -25,6 +25,15 @@ const ALLOWED_EVENTS = new Set([
   'question_open',
   'question_submit',
   'question_chain_complete',
+  // 下一问：属性只允许 slot（记为 q）与 method（记为 mode），禁止携带内容与 token
+  'next_question_created',
+  'next_question_baton_opened',
+  'next_question_baton_submitted',
+  'next_question_baton_shared',
+  'next_question_returned',
+  'next_question_completed',
+  'next_question_result_saved',
+  'next_question_redacted',
 ])
 
 type EventData = Record<string, unknown>
