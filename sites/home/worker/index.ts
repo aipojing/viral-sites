@@ -1,4 +1,5 @@
 import type { PortalEnv } from './env'
+import { handleNextQuestionApi } from '../../next-question/worker/api'
 import { collectProductEvent } from './analytics'
 import { classifyPortalRoute } from './routes'
 import { apiNotFound, featureUnavailable } from './response'
@@ -8,7 +9,7 @@ export { NextQuestionChain } from '../../next-question/worker/question-chain'
 
 // 统一主站 Worker：公共 API → 玩法 API → 深链接改写 → 未知 API JSON 404 → 静态资产。
 export default {
-  async fetch(request: Request, env: PortalEnv, _ctx: ExecutionContext): Promise<Response> {
+  async fetch(request: Request, env: PortalEnv, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url)
     const route = classifyPortalRoute(url)
 
@@ -19,6 +20,11 @@ export default {
         return featureUnavailable('ai-judge')
       case 'hold-button':
         return featureUnavailable('hold-button')
+      case 'next-question-api':
+        return handleNextQuestionApi(request, env, ctx)
+      case 'next-question-shell':
+        // Task 7 会把这里替换为带安全 metadata 的链条 HTML shell
+        return env.ASSETS.fetch(request)
       case 'rewrite': {
         const rewritten = new URL(request.url)
         rewritten.pathname = route.pathname

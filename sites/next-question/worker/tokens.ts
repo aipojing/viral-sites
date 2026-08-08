@@ -1,7 +1,7 @@
 const TOKEN_BYTES = 32
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/
 
-function toBase64Url(bytes: Uint8Array): string {
+export function toBase64Url(bytes: Uint8Array): string {
   let binary = ''
   for (const byte of bytes) binary += String.fromCharCode(byte)
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')

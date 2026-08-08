@@ -19,6 +19,14 @@
       { "name": "NEXT_QUESTION_CHAINS", "class_name": "NextQuestionChain" }
     ]
   },
+  // 1003 是本仓库为下一问保留的正整数 namespace；生产部署前确认账户内未被其他 Worker 占用。
+  "ratelimits": [
+    {
+      "name": "NEXT_QUESTION_CREATE_LIMITER",
+      "namespace_id": "1003",
+      "simple": { "limit": 10, "period": 60 }
+    }
+  ],
   "exports": {
     "NextQuestionChain": { "type": "durable-object", "storage": "sqlite" }
   },

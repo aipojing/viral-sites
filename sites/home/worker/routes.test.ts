@@ -45,6 +45,30 @@ describe('classifyPortalRoute', () => {
     })
   })
 
+  it('下一问 API 命名空间识别为 next-question-api', () => {
+    expect(classifyPortalRoute(new URL('https://example.com/api/next-question/chains'))).toEqual({
+      kind: 'next-question-api',
+    })
+    expect(
+      classifyPortalRoute(new URL('https://example.com/api/next-question/chains/abcd1234abcd1234/baton')),
+    ).toEqual({ kind: 'next-question-api' })
+  })
+
+  it('合法 16 位 slug 的链条深链接识别为 shell；非法 slug 不访问 DO', () => {
+    expect(
+      classifyPortalRoute(new URL('https://example.com/next-question/c/abcd1234abcd1234')),
+    ).toEqual({ kind: 'next-question-shell', slug: 'abcd1234abcd1234' })
+    expect(
+      classifyPortalRoute(new URL('https://example.com/next-question/c/tooshort')),
+    ).toEqual({ kind: 'asset' })
+    expect(
+      classifyPortalRoute(new URL('https://example.com/next-question/c/abcd1234abcd1234/extra')),
+    ).toEqual({ kind: 'asset' })
+    expect(classifyPortalRoute(new URL('https://example.com/next-question/'))).toEqual({
+      kind: 'asset',
+    })
+  })
+
   it('普通页面与静态资源交给静态资产', () => {
     expect(classifyPortalRoute(new URL('https://example.com/'))).toEqual({ kind: 'asset' })
     expect(classifyPortalRoute(new URL('https://example.com/life-grid/'))).toEqual({
