@@ -66,6 +66,6 @@ export function decodeChallenge(d: string): ChallengePayload | null {
   return { v: 1, q: obj.q, n: clampNickname(obj.n), a: [...obj.a] }
 }
 
-export function buildChallengeUrl(origin: string, d: string): string {
-  return `${origin}/c?d=${d}`
+export function buildChallengeUrl(origin: string, data: string): string {
+  return `${origin}/tacit-test/c?d=${encodeURIComponent(data)}`
 }

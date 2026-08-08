@@ -1,6 +1,7 @@
 import type { PortalEnv } from './env'
 import { classifyPortalRoute } from './routes'
 import { apiNotFound, featureUnavailable } from './response'
+import { proxyUmami } from './umami'
 
 // 统一主站 Worker：公共 API → 玩法 API → 深链接改写 → 未知 API JSON 404 → 静态资产。
 export default {
@@ -10,8 +11,7 @@ export default {
 
     switch (route.kind) {
       case 'umami':
-        // Task 3 接入同源代理；接入前静默 202，统计缺失不阻断玩法
-        return new Response(null, { status: 202 })
+        return proxyUmami(request)
       case 'ai-judge':
         return featureUnavailable('ai-judge')
       case 'hold-button':

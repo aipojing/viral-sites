@@ -88,8 +88,13 @@ describe('decodeChallenge 严格校验（全部返回 null，绝不抛错）', (
 })
 
 describe('buildChallengeUrl', () => {
-  it('拼接 /c?d=', () =>
-    expect(buildChallengeUrl('https://tacit-test.pages.dev', 'abc')).toBe(
-      'https://tacit-test.pages.dev/c?d=abc',
+  it('拼接主站同源深链接 /tacit-test/c?d=', () =>
+    expect(buildChallengeUrl('https://guaihaowan.example', 'abc')).toBe(
+      'https://guaihaowan.example/tacit-test/c?d=abc',
+    ))
+
+  it('对 payload 做 URL 编码', () =>
+    expect(buildChallengeUrl('https://guaihaowan.example', 'a b&c')).toBe(
+      'https://guaihaowan.example/tacit-test/c?d=a%20b%26c',
     ))
 })
