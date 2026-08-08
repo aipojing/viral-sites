@@ -1,4 +1,5 @@
 import { computeResult } from '@viral/shared'
+import { installAnalyticsSpy, removeAnalyticsSpy } from '@viral/shared/testing'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -9,17 +10,16 @@ import { SaveCardButton } from './save-card-button'
 const result = computeResult(banWeiConfig, [2, 2, 2, 2, 2, 2, 2, 2])
 
 describe('SaveCardButton', () => {
-  let umamiSpy: ReturnType<typeof vi.fn>
+  let analyticsSpy: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
     installCanvasStub()
     vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue('data:image/png;base64,X')
-    umamiSpy = vi.fn()
-    window.umami = { track: umamiSpy }
+    analyticsSpy = installAnalyticsSpy()
   })
 
   afterEach(() => {
-    delete (window as { umami?: unknown }).umami
+    removeAnalyticsSpy()
     vi.restoreAllMocks()
   })
 
@@ -28,7 +28,7 @@ describe('SaveCardButton', () => {
     vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue('Mozilla/5.0 (Macintosh) Chrome/126')
     render(<SaveCardButton config={banWeiConfig} result={result} />)
     await userEvent.click(screen.getByRole('button', { name: '保存检测报告' }))
-    expect(umamiSpy).toHaveBeenCalledWith('save_image', { slug: 'ban-wei' })
+    expect(analyticsSpy).toHaveBeenCalledWith('save_image', { slug: 'ban-wei' })
   })
 
   it('微信：点击弹出长按提示层', async () => {
@@ -45,7 +45,7 @@ describe('SaveCardButton', () => {
     vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue('Mozilla/5.0 (Macintosh) Chrome/126')
     render(<SaveCardButton config={banWeiConfig} result={result} />)
     await userEvent.click(screen.getByRole('button', { name: '保存检测报告' }))
-    expect(umamiSpy).toHaveBeenCalledWith('export_error', { slug: 'ban-wei' })
+    expect(analyticsSpy).toHaveBeenCalledWith('export_error', { slug: 'ban-wei' })
     expect(screen.getByText('保存失败了，直接截图也一样')).toBeInTheDocument()
   })
 })

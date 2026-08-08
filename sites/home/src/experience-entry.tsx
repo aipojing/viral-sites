@@ -1,7 +1,10 @@
+import { startAnalytics } from '@viral/shared'
 import { House } from '@phosphor-icons/react'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { experienceLoaders, resolveExperienceSlug } from './experience-loaders'
+
+startAnalytics()
 
 async function mountExperience() {
   const slug = resolveExperienceSlug(window.location.pathname)

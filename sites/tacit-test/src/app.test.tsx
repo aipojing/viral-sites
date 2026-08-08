@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { installAnalyticsSpy, removeAnalyticsSpy } from '@viral/shared/testing'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { installCanvasStub } from '../test/canvas-stub'
@@ -30,16 +31,15 @@ describe('initialAppState', () => {
 })
 
 describe('App', () => {
-  let umamiSpy: ReturnType<typeof vi.fn>
+  let analyticsSpy: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
     installCanvasStub()
-    umamiSpy = vi.fn()
-    window.umami = { track: umamiSpy }
+    analyticsSpy = installAnalyticsSpy()
   })
 
   afterEach(() => {
-    delete (window as { umami?: unknown }).umami
+    removeAnalyticsSpy()
     vi.restoreAllMocks()
   })
 
@@ -50,30 +50,30 @@ describe('App', () => {
     await userEvent.click(screen.getByRole('button', { name: '出题' }))
     await answerAll((i) => i % 4)
     expect(screen.getByText('链接已生成，甩给 TA')).toBeInTheDocument()
-    expect(umamiSpy).toHaveBeenCalledWith('generate', { quiz: 'friend' })
-    expect(umamiSpy).toHaveBeenCalledWith('q_answered', { q: 1, mode: 'initiate' })
-    expect(umamiSpy).toHaveBeenCalledWith('q_answered', { q: 10, mode: 'initiate' })
+    expect(analyticsSpy).toHaveBeenCalledWith('generate', { quiz: 'friend' })
+    expect(analyticsSpy).toHaveBeenCalledWith('q_answered', { q: 1, mode: 'initiate' })
+    expect(analyticsSpy).toHaveBeenCalledWith('q_answered', { q: 10, mode: 'initiate' })
   })
 
   it('应战全流程：intro → 昵称 → 10 题 → 对比页，challenge_opened/completed 埋点', async () => {
     const d = encodeChallenge('friend', '阿福', ANSWERS)
     render(<App search={`?d=${d}`} />)
     expect(screen.getByText('阿福 向你发起默契挑战')).toBeInTheDocument()
-    expect(umamiSpy).toHaveBeenCalledWith('challenge_opened', undefined)
+    expect(analyticsSpy).toHaveBeenCalledWith('challenge_opened', undefined)
     await userEvent.type(screen.getByLabelText('你的昵称'), '小明')
     await userEvent.click(screen.getByRole('button', { name: '接招' }))
     await answerAll((i) => ANSWERS[i]) // 全对
     expect(screen.getByText('100%')).toBeInTheDocument()
     expect(screen.getByText('灵魂共振')).toBeInTheDocument()
-    expect(umamiSpy).toHaveBeenCalledWith('challenge_completed', { quiz: 'friend', score: 100 })
-    expect(umamiSpy).toHaveBeenCalledWith('q_answered', { q: 1, mode: 'respond' })
+    expect(analyticsSpy).toHaveBeenCalledWith('challenge_completed', { quiz: 'friend', score: 100 })
+    expect(analyticsSpy).toHaveBeenCalledWith('q_answered', { q: 1, mode: 'respond' })
   })
 
   it('非法链接：落首页提示，challenge_opened 与 link_invalid 都记', () => {
     render(<App search="?d=garbage!!!" />)
     expect(screen.getByText('链接失效了，重新发起一个吧')).toBeInTheDocument()
-    expect(umamiSpy).toHaveBeenCalledWith('challenge_opened', undefined)
-    expect(umamiSpy).toHaveBeenCalledWith('link_invalid', undefined)
+    expect(analyticsSpy).toHaveBeenCalledWith('challenge_opened', undefined)
+    expect(analyticsSpy).toHaveBeenCalledWith('link_invalid', undefined)
   })
 
   it('隐私声明常驻页脚（只此一处）', () => {

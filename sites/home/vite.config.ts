@@ -1,6 +1,6 @@
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import { defineConfig, loadEnv, type Plugin } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -38,28 +38,6 @@ function requirePage(rootDir: string, relativePath: string): string {
   return file
 }
 
-// HTML 中的 %VITE_UMAMI_WEBSITE_ID% 替换为统一统计 website id；
-// 生产构建时该值为空直接失败，避免上线后统计静默丢失。
-function umamiHtmlEnv(): Plugin {
-  let websiteId = ''
-  let isBuild = false
-  return {
-    name: 'umami-html-env',
-    config(_, env) {
-      isBuild = env.command === 'build'
-      websiteId = loadEnv(env.mode, configDir, 'VITE_').VITE_UMAMI_WEBSITE_ID ?? ''
-    },
-    buildStart() {
-      if (isBuild && websiteId === '') {
-        throw new Error('VITE_UMAMI_WEBSITE_ID 为空：生产构建必须配置统一统计 website id')
-      }
-    },
-    transformIndexHtml(html) {
-      return html.replaceAll('%VITE_UMAMI_WEBSITE_ID%', websiteId)
-    },
-  }
-}
-
 // 构建期输出玩法清单，供产物校验门禁与后续工具消费
 const experienceManifest: Plugin = {
   name: 'experience-manifest',
@@ -77,7 +55,7 @@ const experienceManifest: Plugin = {
 }
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), umamiHtmlEnv(), experienceManifest],
+  plugins: [react(), tailwindcss(), experienceManifest],
   server: {
     host: '0.0.0.0',
     allowedHosts: ['terminal.local'],

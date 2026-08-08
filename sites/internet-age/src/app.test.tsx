@@ -1,20 +1,20 @@
 import { render, screen } from '@testing-library/react'
+import { installAnalyticsSpy, removeAnalyticsSpy } from '@viral/shared/testing'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { installCanvasStub } from '../test/canvas-stub'
 import { App } from './app'
 
 describe('App', () => {
-  let umamiSpy: ReturnType<typeof vi.fn>
+  let analyticsSpy: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
     installCanvasStub()
-    umamiSpy = vi.fn()
-    window.umami = { track: umamiSpy }
+    analyticsSpy = installAnalyticsSpy()
   })
 
   afterEach(() => {
-    delete (window as { umami?: unknown }).umami
+    removeAnalyticsSpy()
     vi.restoreAllMocks()
   })
 
@@ -27,10 +27,10 @@ describe('App', () => {
     expect(screen.getByText('你的精神网龄')).toBeInTheDocument()
     expect(screen.getByText('34')).toBeInTheDocument()
     expect(screen.getByText('本卷判定：QQ空间贵族')).toBeInTheDocument()
-    const events = umamiSpy.mock.calls.map((c) => c[0])
+    const events = analyticsSpy.mock.calls.map((c) => c[0])
     expect(events.filter((e) => e === 'q_answered')).toHaveLength(8)
-    expect(umamiSpy).toHaveBeenCalledWith('q_answered', { slug: 'wang-gan', q: 1 })
-    expect(umamiSpy).toHaveBeenCalledWith('generate', { slug: 'wang-gan', age: 34 })
+    expect(analyticsSpy).toHaveBeenCalledWith('q_answered', { slug: 'wang-gan', q: 1 })
+    expect(analyticsSpy).toHaveBeenCalledWith('generate', { slug: 'wang-gan', age: 34 })
   })
 
   it('再考一次回落地屏', async () => {

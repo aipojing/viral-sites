@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { installAnalyticsSpy, removeAnalyticsSpy } from '@viral/shared/testing'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { installCanvasStub } from '../test/canvas-stub'
@@ -9,16 +10,15 @@ function setClipboard(value: unknown) {
 }
 
 describe('App', () => {
-  let umamiSpy: ReturnType<typeof vi.fn>
+  let analyticsSpy: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
     installCanvasStub()
-    umamiSpy = vi.fn()
-    window.umami = { track: umamiSpy }
+    analyticsSpy = installAnalyticsSpy()
   })
 
   afterEach(() => {
-    delete (window as { umami?: unknown }).umami
+    removeAnalyticsSpy()
     setClipboard(undefined)
     vi.restoreAllMocks()
   })
@@ -33,7 +33,7 @@ describe('App', () => {
   it('选场景：上报 scene_selected 且语气胶囊出现', async () => {
     render(<App />)
     await userEvent.click(screen.getByRole('button', { name: /被借钱/ }))
-    expect(umamiSpy).toHaveBeenCalledWith('scene_selected', { scene: 'jieqian' })
+    expect(analyticsSpy).toHaveBeenCalledWith('scene_selected', { scene: 'jieqian' })
     expect(screen.getByRole('button', { name: '委婉体面' })).toBeInTheDocument()
   })
 
@@ -41,8 +41,8 @@ describe('App', () => {
     render(<App />)
     await userEvent.click(screen.getByRole('button', { name: /被借钱/ }))
     await userEvent.click(screen.getByRole('button', { name: '直球硬刚' }))
-    expect(umamiSpy).toHaveBeenCalledWith('tone_selected', { tone: 'yinggang' })
-    expect(umamiSpy).toHaveBeenCalledWith('generate', { scene: 'jieqian', tone: 'yinggang' })
+    expect(analyticsSpy).toHaveBeenCalledWith('tone_selected', { tone: 'yinggang' })
+    expect(analyticsSpy).toHaveBeenCalledWith('generate', { scene: 'jieqian', tone: 'yinggang' })
     expect(screen.getByText('不借。我的钱也是一分一分挣的。')).toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: '复制' })).toHaveLength(3)
     expect(screen.getAllByRole('button', { name: '保存卡片' })).toHaveLength(3)
@@ -54,7 +54,7 @@ describe('App', () => {
     await userEvent.click(screen.getByRole('button', { name: /被借钱/ }))
     await userEvent.click(screen.getByRole('button', { name: '直球硬刚' }))
     await userEvent.click(screen.getAllByRole('button', { name: '复制' })[0])
-    expect(umamiSpy).toHaveBeenCalledWith('copy', { scene: 'jieqian', tone: 'yinggang' })
+    expect(analyticsSpy).toHaveBeenCalledWith('copy', { scene: 'jieqian', tone: 'yinggang' })
   })
 
   it('切换场景后话术跟着换', async () => {
@@ -86,8 +86,8 @@ describe('App', () => {
 
     expect(screen.getAllByRole('button', { name: '复制' })).toHaveLength(3)
     expect(screen.getAllByText(/同事让我替他背锅/).length).toBeGreaterThan(0)
-    expect(umamiSpy).toHaveBeenCalledWith('custom_scene_opened', { mode: 'local' })
-    expect(umamiSpy).toHaveBeenCalledWith('custom_scene_submitted', { mode: 'local' })
-    expect(JSON.stringify(umamiSpy.mock.calls)).not.toContain('同事让我替他背锅')
+    expect(analyticsSpy).toHaveBeenCalledWith('custom_scene_opened', { mode: 'local' })
+    expect(analyticsSpy).toHaveBeenCalledWith('custom_scene_submitted', { mode: 'local' })
+    expect(JSON.stringify(analyticsSpy.mock.calls)).not.toContain('同事让我替他背锅')
   })
 })

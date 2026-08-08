@@ -1,5 +1,5 @@
 export type PortalRoute =
-  | { kind: 'umami' }
+  | { kind: 'analytics' }
   | { kind: 'ai-judge' }
   | { kind: 'hold-button' }
   | { kind: 'rewrite'; pathname: '/tacit-test/' }
@@ -9,7 +9,7 @@ export type PortalRoute =
 export function classifyPortalRoute(url: URL): PortalRoute {
   const { pathname } = url
 
-  if (pathname === '/api/send') return { kind: 'umami' }
+  if (pathname === '/api/events') return { kind: 'analytics' }
   if (pathname === '/api/ai-judge' || pathname.startsWith('/api/ai-judge/')) {
     return { kind: 'ai-judge' }
   }

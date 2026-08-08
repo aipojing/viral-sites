@@ -1,22 +1,22 @@
 import { render, screen } from '@testing-library/react'
+import { installAnalyticsSpy, removeAnalyticsSpy } from '@viral/shared/testing'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { installCanvasStub } from '../test/canvas-stub'
 import { App } from './app'
 
 describe('App', () => {
-  let umamiSpy: ReturnType<typeof vi.fn>
+  let analyticsSpy: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
     installCanvasStub()
     vi.spyOn(window, 'requestAnimationFrame').mockReturnValue(1)
     vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {})
-    umamiSpy = vi.fn()
-    window.umami = { track: umamiSpy }
+    analyticsSpy = installAnalyticsSpy()
   })
 
   afterEach(() => {
-    delete (window as { umami?: unknown }).umami
+    removeAnalyticsSpy()
     vi.restoreAllMocks()
   })
 
@@ -25,7 +25,7 @@ describe('App', () => {
     await userEvent.type(screen.getByLabelText('出生日期'), '1996-08-04')
     await userEvent.click(screen.getByRole('button', { name: '看看我的人生' }))
     expect(screen.getByLabelText('人生格子图')).toBeInTheDocument()
-    expect(umamiSpy).toHaveBeenCalledWith('generate', undefined)
+    expect(analyticsSpy).toHaveBeenCalledWith('generate', undefined)
     await userEvent.click(screen.getByRole('button', { name: '重新计算' }))
     expect(screen.getByLabelText('出生日期')).toBeInTheDocument()
   })

@@ -51,7 +51,7 @@ viral-sites/
     shared/               # 共享能力，唯一允许被 sites 依赖的包
       src/
         share-card/       # 分享卡片：canvas 渲染 + 保存适配
-        analytics/        # 埋点封装（umami）
+        analytics/        # 第一方产品事件采集
         ui/               # 移动端优先的基础组件（按钮/输入/布局）
   sites/
     life-grid/            # 01 人生进度条
@@ -78,13 +78,14 @@ viral-sites/
 
 ### 4.3 共享能力二：埋点（工厂的眼睛）
 
-- 工具：umami（先用 umami cloud 免费额度，事件量超限再自托管到 Cloudflare Workers）
-- `track(event, data?)` 薄封装：失败静默（统计不能影响用户体验），但在 dev 模式下 console 告警
+- 工具：主站 Worker 同源接收 `/api/events`，写入 Cloudflare Analytics Engine；运行错误单独进入 Workers Logs
+- `track(event, data?)` 薄封装：使用匿名 sessionStorage 会话标识，优先 `sendBeacon`、降级 `fetch keepalive`，失败静默且不影响玩法
 - **事件规范**（所有站统一，便于横向对比）：
-  - `visit`：进入站点（umami 自带 pageview 即可）
+  - `page_view`：进入站点，由统一入口自动上报
   - `generate`：生成结果（= 完成核心流程）
   - `save_image`：保存/长按查看卡片（= 传播意向，核心指标分子）
   - 站点可加自定义事件，但这三个必须有且语义一致
+- 隐私边界：不记录 IP、完整 User-Agent、昵称、输入正文和问答内容；Worker 只接收事件白名单及固定维度
 
 ### 4.4 部署
 

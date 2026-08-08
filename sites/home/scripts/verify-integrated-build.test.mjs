@@ -16,7 +16,7 @@ function makeDist(slugPages, manifestSlugs = Object.keys(slugPages)) {
   mkdirSync(distDir, { recursive: true })
   writeFileSync(
     path.join(distDir, 'index.html'),
-    '<html><head><script defer src="/u.js"></script></head><body><script type="module" crossorigin src="/assets/home-abc123.js"></script></body></html>',
+    '<html><body><script type="module" crossorigin src="/assets/home-abc123.js"></script></body></html>',
   )
   writeFileSync(
     path.join(distDir, 'experience-manifest.json'),
@@ -34,7 +34,7 @@ function makeDist(slugPages, manifestSlugs = Object.keys(slugPages)) {
 }
 
 const GOOD_HTML =
-  '<html><head><script defer src="/u.js"></script></head><body><script type="module" crossorigin src="/assets/app-abc123.js"></script></body></html>'
+  '<html><body><script type="module" crossorigin src="/assets/app-abc123.js"></script></body></html>'
 
 describe('verifyIntegratedBuild', () => {
   it('产物齐全且全部同源时通过', () => {
@@ -69,6 +69,14 @@ describe('verifyIntegratedBuild', () => {
     })
     const errors = verifyIntegratedBuild({ rootDir: distDir, slugs: ['life-grid'] })
     expect(errors.some((error) => error.includes('/assets/'))).toBe(true)
+  })
+
+  it('产物不能继续引用旧 Umami 客户端', () => {
+    const distDir = makeDist({
+      'life-grid': '<html><body><script src="/u.js"></script></body></html>',
+    })
+    const errors = verifyIntegratedBuild({ rootDir: distDir, slugs: ['life-grid'] })
+    expect(errors.some((error) => error.includes('/u.js'))).toBe(true)
   })
 
   it('残留 VITE_*_URL 外跳配置时报错', () => {

@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { installAnalyticsSpy, removeAnalyticsSpy } from '@viral/shared/testing'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Phrase } from '@viral/shared'
@@ -26,15 +27,14 @@ function setClipboard(value: unknown) {
 }
 
 describe('PhraseList', () => {
-  let umamiSpy: ReturnType<typeof vi.fn>
+  let analyticsSpy: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
-    umamiSpy = vi.fn()
-    window.umami = { track: umamiSpy }
+    analyticsSpy = installAnalyticsSpy()
   })
 
   afterEach(() => {
-    delete (window as { umami?: unknown }).umami
+    removeAnalyticsSpy()
     setClipboard(undefined)
     delete (document as { execCommand?: unknown }).execCommand
     vi.restoreAllMocks()
@@ -49,7 +49,7 @@ describe('PhraseList', () => {
 
   it('挂载即上报 generate（scene/tone id）', () => {
     render(<PhraseList phrases={three} scene={scene} tone={tone} />)
-    expect(umamiSpy).toHaveBeenCalledWith('generate', { scene: 'jieqian', tone: 'weiwan' })
+    expect(analyticsSpy).toHaveBeenCalledWith('generate', { scene: 'jieqian', tone: 'weiwan' })
   })
 
   it('输入称呼后实时替换', async () => {
@@ -63,7 +63,7 @@ describe('PhraseList', () => {
     render(<PhraseList phrases={three} scene={scene} tone={tone} />)
     await userEvent.click(screen.getAllByRole('button', { name: '复制' })[0])
     expect(await screen.findByRole('button', { name: '已复制' })).toBeInTheDocument()
-    expect(umamiSpy).toHaveBeenCalledWith('copy', { scene: 'jieqian', tone: 'weiwan' })
+    expect(analyticsSpy).toHaveBeenCalledWith('copy', { scene: 'jieqian', tone: 'weiwan' })
   })
 
   it('复制的是替换称呼后的最终文案', async () => {
@@ -81,7 +81,7 @@ describe('PhraseList', () => {
     render(<PhraseList phrases={three} scene={scene} tone={tone} />)
     await userEvent.click(screen.getAllByRole('button', { name: '复制' })[0])
     expect(await screen.findByText('复制失败了，长按文字也能复制')).toBeInTheDocument()
-    expect(umamiSpy).not.toHaveBeenCalledWith('copy', expect.anything())
+    expect(analyticsSpy).not.toHaveBeenCalledWith('copy', expect.anything())
   })
 
   it('恰好 3 条时不渲染「换一批」', () => {
@@ -95,7 +95,7 @@ describe('PhraseList', () => {
     await userEvent.click(screen.getByRole('button', { name: '换一批' }))
     expect(screen.getByText('候选话术第4条。')).toBeInTheDocument()
     expect(screen.queryByText('候选话术第1条。')).not.toBeInTheDocument()
-    expect(umamiSpy.mock.calls.filter(([e]) => e === 'generate')).toHaveLength(2)
+    expect(analyticsSpy.mock.calls.filter(([e]) => e === 'generate')).toHaveLength(2)
   })
 
   it('renderSaveAction 插槽拿到替换后的文案', async () => {

@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { installAnalyticsSpy, removeAnalyticsSpy } from '@viral/shared/testing'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { CopyLinkButton } from './copy-link-button'
@@ -6,15 +7,14 @@ import { CopyLinkButton } from './copy-link-button'
 const URL = 'https://tacit-test.pages.dev/c?d=abc'
 
 describe('CopyLinkButton', () => {
-  let umamiSpy: ReturnType<typeof vi.fn>
+  let analyticsSpy: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
-    umamiSpy = vi.fn()
-    window.umami = { track: umamiSpy }
+    analyticsSpy = installAnalyticsSpy()
   })
 
   afterEach(() => {
-    delete (window as { umami?: unknown }).umami
+    removeAnalyticsSpy()
     vi.restoreAllMocks()
     vi.unstubAllGlobals()
   })
@@ -27,7 +27,7 @@ describe('CopyLinkButton', () => {
     render(<CopyLinkButton url={URL} />)
     await userEvent.click(screen.getByRole('button', { name: '复制挑战链接' }))
     expect(await screen.findByText('已复制，去粘贴给对方吧')).toBeInTheDocument()
-    expect(umamiSpy).toHaveBeenCalledWith('copy_link', undefined)
+    expect(analyticsSpy).toHaveBeenCalledWith('copy_link', undefined)
   })
 
   it('复制失败：展示可手动复制的只读链接与提示', async () => {
@@ -39,6 +39,6 @@ describe('CopyLinkButton', () => {
     await userEvent.click(screen.getByRole('button', { name: '复制挑战链接' }))
     expect(await screen.findByLabelText('挑战链接')).toHaveValue(URL)
     expect(screen.getByText('自动复制被拦下了，长按上面这行手动复制')).toBeInTheDocument()
-    expect(umamiSpy).not.toHaveBeenCalledWith('copy_link', undefined)
+    expect(analyticsSpy).not.toHaveBeenCalledWith('copy_link', undefined)
   })
 })

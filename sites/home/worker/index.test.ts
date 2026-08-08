@@ -6,8 +6,12 @@ function makeEnv(assetResponse = new Response('asset', { status: 200 })) {
   const fetchMock = vi.fn<(input: Request | string | URL, init?: RequestInit) => Promise<Response>>(
     async () => assetResponse,
   )
-  const env = { ASSETS: { fetch: fetchMock } } as unknown as PortalEnv
-  return { env, fetchMock }
+  const writeDataPoint = vi.fn()
+  const env = {
+    ASSETS: { fetch: fetchMock },
+    PRODUCT_ANALYTICS: { writeDataPoint },
+  } as unknown as PortalEnv
+  return { env, fetchMock, writeDataPoint }
 }
 
 const ctx = {
@@ -16,6 +20,65 @@ const ctx = {
 } as unknown as ExecutionContext
 
 describe('portal worker entry', () => {
+  it('校验并写入第一方产品事件后返回 202', async () => {
+    const { env, writeDataPoint } = makeEnv()
+    const response = await worker.fetch(
+      new Request('https://example.com/api/events', {
+        method: 'POST',
+        body: JSON.stringify({
+          event: 'generate',
+          data: { slug: 'wang-gan', age: 34, ignored: 'secret' },
+          path: '/internet-age/',
+          referrer: 'https://example.cn/somewhere?q=private',
+          sessionId: 'session-123',
+        }),
+      }),
+      env,
+      ctx,
+    )
+
+    expect(response.status).toBe(202)
+    expect(writeDataPoint).toHaveBeenCalledWith({
+      indexes: ['session-123'],
+      blobs: [
+        'generate',
+        '/internet-age/',
+        'example.cn',
+        'wang-gan',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+      ],
+      doubles: [1, 0, 0, 0, 34, 0],
+    })
+  })
+
+  it('拒绝未知事件且不写入统计', async () => {
+    const { env, writeDataPoint } = makeEnv()
+    const response = await worker.fetch(
+      new Request('https://example.com/api/events', {
+        method: 'POST',
+        body: JSON.stringify({ event: 'steal_everything', path: '/', sessionId: 'session-123' }),
+      }),
+      env,
+      ctx,
+    )
+
+    expect(response.status).toBe(400)
+    expect(await response.json()).toEqual({ code: 'invalid_event' })
+    expect(writeDataPoint).not.toHaveBeenCalled()
+  })
+
+  it('产品事件接口只接受 POST', async () => {
+    const { env } = makeEnv()
+    const response = await worker.fetch(new Request('https://example.com/api/events'), env, ctx)
+    expect(response.status).toBe(405)
+  })
+
   it('未知 API 返回 JSON 404，不回退静态资产', async () => {
     const { env, fetchMock } = makeEnv()
 

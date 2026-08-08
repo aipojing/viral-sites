@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { installAnalyticsSpy, removeAnalyticsSpy } from '@viral/shared/testing'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { installCanvasStub } from '../../test/canvas-stub'
@@ -15,17 +16,16 @@ const data: QuoteCardData = {
 }
 
 describe('SaveQuoteButton', () => {
-  let umamiSpy: ReturnType<typeof vi.fn>
+  let analyticsSpy: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
     installCanvasStub()
     vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue('data:image/png;base64,X')
-    umamiSpy = vi.fn()
-    window.umami = { track: umamiSpy }
+    analyticsSpy = installAnalyticsSpy()
   })
 
   afterEach(() => {
-    delete (window as { umami?: unknown }).umami
+    removeAnalyticsSpy()
     vi.restoreAllMocks()
   })
 
@@ -34,7 +34,7 @@ describe('SaveQuoteButton', () => {
     vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue('Mozilla/5.0 (Macintosh) Chrome/126')
     render(<SaveQuoteButton data={data} />)
     await userEvent.click(screen.getByRole('button', { name: '保存卡片' }))
-    expect(umamiSpy).toHaveBeenCalledWith('save_image', { scene: 'jieqian', tone: 'yinggang' })
+    expect(analyticsSpy).toHaveBeenCalledWith('save_image', { scene: 'jieqian', tone: 'yinggang' })
   })
 
   it('微信：点击弹出长按提示层', async () => {
@@ -51,7 +51,7 @@ describe('SaveQuoteButton', () => {
     vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue('Mozilla/5.0 (Macintosh) Chrome/126')
     render(<SaveQuoteButton data={data} />)
     await userEvent.click(screen.getByRole('button', { name: '保存卡片' }))
-    expect(umamiSpy).toHaveBeenCalledWith('export_error', undefined)
+    expect(analyticsSpy).toHaveBeenCalledWith('export_error', undefined)
     expect(screen.getByText('保存失败了，直接截图也一样')).toBeInTheDocument()
   })
 })

@@ -53,8 +53,8 @@ function checkEntryHtml(errors, htmlPath, label) {
   }
   for (const match of html.matchAll(/<script[^>]*\ssrc="([^"]+)"/g)) {
     const src = match[1]
-    if (!src.startsWith('/assets/') && src !== '/u.js') {
-      errors.push(`${label} 的脚本必须来自主站 /assets/（或 /u.js）：${src}`)
+    if (!src.startsWith('/assets/')) {
+      errors.push(`${label} 的脚本必须来自主站 /assets/：${src}`)
     }
   }
 }

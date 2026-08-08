@@ -2,9 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { classifyPortalRoute } from './routes'
 
 describe('classifyPortalRoute', () => {
-  it('把 Umami 上报识别为 umami 代理', () => {
+  it('把第一方产品事件识别为 analytics 接口', () => {
+    expect(classifyPortalRoute(new URL('https://example.com/api/events'))).toEqual({
+      kind: 'analytics',
+    })
     expect(classifyPortalRoute(new URL('https://example.com/api/send'))).toEqual({
-      kind: 'umami',
+      kind: 'api-not-found',
     })
   })
 
@@ -50,7 +53,6 @@ describe('classifyPortalRoute', () => {
     expect(classifyPortalRoute(new URL('https://example.com/tacit-test/'))).toEqual({
       kind: 'asset',
     })
-    expect(classifyPortalRoute(new URL('https://example.com/u.js'))).toEqual({ kind: 'asset' })
     expect(classifyPortalRoute(new URL('https://example.com/assets/x.png'))).toEqual({
       kind: 'asset',
     })

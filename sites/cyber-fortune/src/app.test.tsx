@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
+import { installAnalyticsSpy, removeAnalyticsSpy } from '@viral/shared/testing'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { installCanvasStub } from '../test/canvas-stub'
 import { App } from './app'
@@ -13,18 +14,17 @@ function drawOnce() {
 }
 
 describe('App', () => {
-  let umamiSpy: ReturnType<typeof vi.fn>
+  let analyticsSpy: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
     localStorage.clear()
     installCanvasStub()
     vi.useFakeTimers()
-    umamiSpy = vi.fn()
-    window.umami = { track: umamiSpy }
+    analyticsSpy = installAnalyticsSpy()
   })
 
   afterEach(() => {
-    delete (window as { umami?: unknown }).umami
+    removeAnalyticsSpy()
     vi.useRealTimers()
     vi.restoreAllMocks()
   })
@@ -35,8 +35,8 @@ describe('App', () => {
     drawOnce()
     expect(screen.getByText(/连续求签第 1 天/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '保存今日签' })).toBeInTheDocument()
-    expect(umamiSpy).toHaveBeenCalledWith('generate', { level: expect.any(String) })
-    expect(umamiSpy).toHaveBeenCalledWith('streak_day', { streak: 1 })
+    expect(analyticsSpy).toHaveBeenCalledWith('generate', { level: expect.any(String) })
+    expect(analyticsSpy).toHaveBeenCalledWith('streak_day', { streak: 1 })
   })
 
   it('同天重复求签：出「心诚，一天一签」，streak_day 不重报，generate 照报', () => {
@@ -47,7 +47,7 @@ describe('App', () => {
     drawOnce()
     expect(screen.getByText('心诚，一天一签')).toBeInTheDocument()
     expect(screen.getByText(/连续求签第 1 天/)).toBeInTheDocument()
-    const calls = (name: string) => umamiSpy.mock.calls.filter((c) => c[0] === name).length
+    const calls = (name: string) => analyticsSpy.mock.calls.filter((c) => c[0] === name).length
     expect(calls('generate')).toBe(2)
     expect(calls('streak_day')).toBe(1)
   })

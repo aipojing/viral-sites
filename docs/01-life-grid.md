@@ -94,7 +94,7 @@
   - `weeksLived(birth, today)` / `totalWeeks(expectancy)` / `percentLived(...)`
   - `parentMeetings(parentAge, perYear)` / `remainingFestivals(...)` / `workdaysToRetire(...)`
   - 全部接受显式 `today` 参数（可测性；杜绝隐式取当前时间）
-- 埋点：`visit` / `generate`（点「看看我的人生」）/ `save_image`（触发卡片保存或长按提示曝光）
+- 埋点：`page_view` / `generate`（点「看看我的人生」）/ `save_image`（触发卡片保存或长按提示曝光）
 - SEO 白送部分：标题「人生进度条 — 你的人生还剩多少个星期」，描述带「还能见父母多少次」关键词
 
 ## 7. 测试
@@ -106,7 +106,7 @@
 ## 8. 上线检查清单
 
 - [ ] 四环境保存卡片路径手工验证通过
-- [ ] 埋点三事件在 umami 后台可见
+- [ ] 三个产品事件可从 Cloudflare Analytics Engine 查询
 - [ ] 首屏资源 < 100KB（gzip）
 - [ ] 文案过一遍「扎心但不绝望」的尺度审（没有让人看完想哭而不想转的条目）
 - [ ] 页面明示「所有计算在本地完成，生日不会被上传」
