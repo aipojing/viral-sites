@@ -13,6 +13,16 @@ body {
   font-family: -apple-system, 'PingFang SC', 'Noto Sans SC', system-ui, sans-serif;
 }
 
+/* 手写感标题：优先中文衬线/宋体，降级到系统 serif */
+.font-serif-cn {
+  font-family: 'Songti SC', 'Noto Serif SC', 'STSong', 'SimSun', serif;
+}
+
+:focus-visible {
+  outline: 3px solid rgba(43, 89, 195, 0.5);
+  outline-offset: 2px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;
