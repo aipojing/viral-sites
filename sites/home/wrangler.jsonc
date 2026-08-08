@@ -9,7 +9,7 @@
     "binding": "ASSETS",
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "none",
-    "run_worker_first": ["/api/*", "/tacit-test/c*"]
+    "run_worker_first": ["/api/*", "/tacit-test/c*", "/next-question/c/*"]
   },
   "analytics_engine_datasets": [
     { "binding": "PRODUCT_ANALYTICS", "dataset": "guaihaowan_product_events" }

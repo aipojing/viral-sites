@@ -1,6 +1,7 @@
 import type { PortalEnv } from './env'
 import { handleNextQuestionApi } from '../../next-question/worker/api'
 import { collectProductEvent } from './analytics'
+import { serveNextQuestionShell } from './next-question-shell'
 import { classifyPortalRoute } from './routes'
 import { apiNotFound, featureUnavailable } from './response'
 
@@ -22,6 +23,8 @@ export default {
         return featureUnavailable('hold-button')
       case 'next-question-api':
         return handleNextQuestionApi(request, env, ctx)
+      case 'next-question-shell':
+        return serveNextQuestionShell(request, env, route.slug)
       case 'next-question-shell':
         // Task 7 会把这里替换为带安全 metadata 的链条 HTML shell
         return env.ASSETS.fetch(request)
