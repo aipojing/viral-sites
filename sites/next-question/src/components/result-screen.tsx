@@ -38,9 +38,17 @@ function AnswerBlock({ entry, answerer }: { entry?: ChainEntry; answerer: Slot }
   )
 }
 
-export function ResultScreen({ chain }: { chain: PublicChain }) {
+export function ResultScreen({
+  chain,
+  onDelete,
+}: {
+  chain: PublicChain
+  onDelete?(): Promise<void>
+}) {
   const publicUrl = buildPublicChainUrl(window.location.origin, chain.slug)
   const [shared, setShared] = useState(false)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const startDate = new Date(chain.createdAt).toLocaleDateString('zh-CN', {
     year: 'numeric',
     month: '2-digit',
@@ -108,6 +116,44 @@ export function ResultScreen({ chain }: { chain: PublicChain }) {
           {shared ? '结果页链接已就绪。' : '结果卡只放摘录，完整问答留在网页里。'}
         </p>
       </section>
+
+      {onDelete ? (
+        <div className="mt-8 border-t border-stone-200 pt-4">
+          {confirmingDelete ? (
+            <div className="flex flex-col gap-3 rounded-xl border border-[#c8392b]/40 bg-[#c8392b]/5 px-4 py-3">
+              <p className="text-sm text-stone-700">删除后整条链的问答都会清空，且无法恢复。确定吗？</p>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDeleting(true)
+                    void onDelete()
+                  }}
+                  disabled={deleting}
+                  className="min-h-11 rounded-full bg-[#c8392b] px-5 text-sm font-semibold text-white disabled:opacity-50"
+                >
+                  {deleting ? '正在删除……' : '确认删除'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmingDelete(false)}
+                  className="min-h-11 rounded-full border border-stone-300 px-5 text-sm text-stone-600"
+                >
+                  先留着
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setConfirmingDelete(true)}
+              className="min-h-11 text-sm text-stone-400 underline underline-offset-4 hover:text-[#c8392b]"
+            >
+              删除这条接力
+            </button>
+          )}
+        </div>
+      ) : null}
     </main>
   )
 }

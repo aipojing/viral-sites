@@ -123,6 +123,8 @@ export function App() {
       const slug = result.chain.slug
       saveOwnerToken(slug, result.ownerToken, window.localStorage)
       saveBatonToken(slug, result.batonToken, window.localStorage)
+      // 刷新必须能恢复守环页：地址栏切到链条路径（token 只留在 vault，不进 URL）
+      window.history.replaceState(null, '', `/next-question/c/${slug}`)
       track('next_question_created')
       setState({ screen: 'handoff', chain: result.chain, nextToken: result.batonToken, origin: 'create' })
       return null
@@ -235,7 +237,14 @@ export function App() {
         />
       )
     case 'result':
-      return <ResultScreen chain={state.chain} />
+      return (
+        <ResultScreen
+          chain={state.chain}
+          onDelete={
+            state.ownerToken ? () => handleDelete(state.chain.slug, state.ownerToken as string) : undefined
+          }
+        />
+      )
     case 'error':
       return <ErrorScreen code={state.code} slug={state.slug} />
   }

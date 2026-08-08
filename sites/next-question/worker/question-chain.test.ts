@@ -323,6 +323,47 @@ describe('NextQuestionChain redact', () => {
     const replay = await harness.chain.redact(harness.created.ownerToken, 1, requestId, NOW + 2000)
     expect(replay).toEqual(first)
   })
+
+  it('席位 token 只能撤回自己的席位，不能越权', async () => {
+    const harness = await startChain()
+    const slot2 = await harness.chain.submitBaton(
+      harness.created.batonToken,
+      batonInput({ nickname: '第二席' }),
+      NOW + 1000,
+    )
+    const slot3 = await harness.chain.submitBaton(
+      slot2.nextBatonToken as string,
+      batonInput({ nickname: '第三席' }),
+      NOW + 2000,
+    )
+
+    // 第 3 席的撤回 token 不能撤回第 2 席
+    await expectChainError(
+      harness.chain.redact(slot3.participantToken, 2, crypto.randomUUID(), NOW + 3000),
+      'invalid_token',
+    )
+    // 第 2 席的撤回 token 也不能撤回第 3 席
+    await expectChainError(
+      harness.chain.redact(slot2.participantToken, 3, crypto.randomUUID(), NOW + 3000),
+      'invalid_token',
+    )
+    const unchanged = await harness.chain.getPublic(NOW + 3000)
+    expect(unchanged?.entries.every((entry) => !entry.redacted)).toBe(true)
+  })
+
+  it('owner 与 baton token 不能互相越权', async () => {
+    const harness = await startChain()
+    // owner token 不能当接棒 token 用
+    await expectChainError(
+      harness.chain.submitBaton(harness.created.ownerToken, batonInput(), NOW + 1000),
+      'invalid_token',
+    )
+    // baton token 不能删除链条
+    await expectChainError(
+      harness.chain.deleteChain(harness.created.batonToken, crypto.randomUUID(), NOW + 1000),
+      'invalid_token',
+    )
+  })
 })
 
 describe('NextQuestionChain deleteChain', () => {

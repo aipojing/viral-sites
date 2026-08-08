@@ -342,6 +342,108 @@ describe('链条读取与提交接口', () => {
   })
 })
 
+describe('六人 API 全链', () => {
+  it('创建 → 第 2～6 席 → owner 收尾：恰好 6 组问答，旧接棒全部失效', async () => {
+    const harness = makeHarness()
+    const { body, result } = await createChain(harness)
+    const slug = result.chain.slug
+
+    let baton = result.batonToken
+    for (let slot = 2; slot <= 6; slot += 1) {
+      const response = await harness.call(
+        'POST',
+        `/api/next-question/chains/${slug}/baton`,
+        {
+          requestId: crypto.randomUUID(),
+          nickname: `第${slot}席`,
+          answer: `第${slot}席的回答`,
+          question: `第${slot}席的问题`,
+        },
+        baton,
+      )
+      expect(response.status).toBe(200)
+      const advanced = (await response.json()) as SubmitBatonResult
+      if (slot === 6) {
+        expect(advanced.chain.status).toBe('returned')
+        expect(advanced.nextBatonToken).toBeNull()
+      } else {
+        baton = advanced.nextBatonToken as string
+      }
+    }
+
+    const closed = await harness.call(
+      'POST',
+      `/api/next-question/chains/${slug}/close`,
+      { requestId: crypto.randomUUID(), answer: '值得。' },
+      result.ownerToken,
+    )
+    expect(closed.status).toBe(200)
+    const chain = (await closed.json()) as { status: string; entries: Array<{ slot: number; answer: string | null; question: string }> }
+    expect(chain.status).toBe('completed')
+    expect(chain.entries).toHaveLength(6)
+    expect(chain.entries.filter((entry) => entry.answer !== null)).toHaveLength(6)
+    expect(chain.entries[0]?.answer).toBe('值得。')
+
+    // 旧接棒 token 在闭环后永久失效
+    const stale = await harness.call(
+      'POST',
+      `/api/next-question/chains/${slug}/baton`,
+      { requestId: crypto.randomUUID(), nickname: '不速之客', answer: 'x', question: 'y' },
+      baton,
+    )
+    expect(stale.status).toBe(409)
+
+    // 公开响应绝不包含任何 capability
+    const publicResponse = await harness.call('GET', `/api/next-question/chains/${slug}`)
+    const publicJson = JSON.stringify(await publicResponse.json())
+    expect(publicJson).not.toContain(result.ownerToken)
+    expect(publicJson).not.toContain(result.batonToken)
+  })
+
+  it('错误响应不回显请求里的 token 与正文', async () => {
+    const harness = makeHarness()
+    const { result } = await createChain(harness)
+    const secretInBody = '绝密正文不应回显'
+    const response = await harness.call(
+      'POST',
+      `/api/next-question/chains/${result.chain.slug}/baton`,
+      { requestId: crypto.randomUUID(), nickname: '丁', answer: secretInBody, question: 'q' },
+      'x'.repeat(43),
+    )
+    expect(response.status).toBe(403)
+    const text = await response.text()
+    expect(text).not.toContain('x'.repeat(43))
+    expect(text).not.toContain(secretInBody)
+  })
+
+  it('DO 错误跨 RPC 退化为普通 Error 时仍按 message 映射状态码', async () => {
+    const namespace = {
+      idFromName: (name: string) => ({ toString: () => name }),
+      get: () => ({
+        submitBaton: async () => {
+          throw new Error('chain_advanced')
+        },
+      }),
+    }
+    const env = {
+      NEXT_QUESTION_CHAINS: namespace,
+      NEXT_QUESTION_CREATE_LIMITER: { limit: async () => ({ success: true }) },
+    } as unknown as NextQuestionEnv
+    const ctx = { waitUntil: () => {}, passThroughOnException: () => {} } as unknown as ExecutionContext
+    const response = await handleNextQuestionApi(
+      new Request(`${ORIGIN}/api/next-question/chains/${'abcd1234abcd1234'}/baton`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', authorization: 'Bearer x' },
+        body: JSON.stringify({ requestId: crypto.randomUUID(), nickname: '甲', answer: '乙', question: '丙' }),
+      }),
+      env,
+      ctx,
+    )
+    expect(response.status).toBe(409)
+    expect(await response.json()).toEqual({ code: 'chain_advanced' })
+  })
+})
+
 describe('API 响应安全头', () => {
   it('所有响应携带 Cache-Control: no-store 与 JSON content-type', async () => {
     const harness = makeHarness()

@@ -78,7 +78,7 @@ export function normalizeAnswer(raw: unknown): string {
   return joined
 }
 
-function requireRequestId(raw: unknown): string {
+export function parseRequestId(raw: unknown): string {
   if (typeof raw !== 'string' || raw.trim() === '') throw new InputError('required')
   const id = raw.trim().toLowerCase()
   if (!REQUEST_ID_PATTERN.test(id)) throw new InputError('invalid_character')
@@ -92,8 +92,8 @@ export function parseCreateChainInput(raw: {
   question?: unknown
 }): CreateChainInput {
   return {
-    requestId: requireRequestId(raw.requestId),
-    installationId: requireRequestId(raw.installationId),
+    requestId: parseRequestId(raw.requestId),
+    installationId: parseRequestId(raw.installationId),
     nickname: normalizeNickname(raw.nickname),
     question: normalizeQuestion(raw.question),
   }
@@ -106,7 +106,7 @@ export function parseSubmitBatonInput(raw: {
   question?: unknown
 }): SubmitBatonInput {
   return {
-    requestId: requireRequestId(raw.requestId),
+    requestId: parseRequestId(raw.requestId),
     nickname: normalizeNickname(raw.nickname),
     answer: normalizeAnswer(raw.answer),
     question: normalizeQuestion(raw.question),
@@ -118,7 +118,7 @@ export function parseCloseChainInput(raw: {
   answer?: unknown
 }): CloseChainInput {
   return {
-    requestId: requireRequestId(raw.requestId),
+    requestId: parseRequestId(raw.requestId),
     answer: normalizeAnswer(raw.answer),
   }
 }

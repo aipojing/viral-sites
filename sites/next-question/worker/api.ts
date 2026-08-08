@@ -156,8 +156,8 @@ export async function handleNextQuestionApi(
     return json(200, await stub.redact(token, slot, requestId, Date.now()))
   } catch (error) {
     if (error instanceof InputError) return validationFailed()
-    if (error instanceof ChainError) return mapChainError(error)
-    throw error
+    // ChainError 跨 DO RPC 后会失去原型，code 保留在 message 中，统一走映射
+    return mapChainError(error)
   }
 }
 
