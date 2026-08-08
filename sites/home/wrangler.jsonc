@@ -14,5 +14,13 @@
   "analytics_engine_datasets": [
     { "binding": "PRODUCT_ANALYTICS", "dataset": "guaihaowan_product_events" }
   ],
+  "durable_objects": {
+    "bindings": [
+      { "name": "NEXT_QUESTION_CHAINS", "class_name": "NextQuestionChain" }
+    ]
+  },
+  "exports": {
+    "NextQuestionChain": { "type": "durable-object", "storage": "sqlite" }
+  },
   "observability": { "enabled": true }
 }

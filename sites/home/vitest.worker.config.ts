@@ -18,6 +18,7 @@ export default defineConfig({
       'scripts/**/*.test.mjs',
       '../ai-judge/worker/**/*.test.ts',
       '../hold-button/worker/**/*.test.ts',
+      '../next-question/worker/**/*.test.ts',
     ],
   },
 })

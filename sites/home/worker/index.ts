@@ -3,6 +3,9 @@ import { collectProductEvent } from './analytics'
 import { classifyPortalRoute } from './routes'
 import { apiNotFound, featureUnavailable } from './response'
 
+// 声明式 exports：唯一主站 Worker 承载下一问的 SQLite-backed Durable Object。
+export { NextQuestionChain } from '../../next-question/worker/question-chain'
+
 // 统一主站 Worker：公共 API → 玩法 API → 深链接改写 → 未知 API JSON 404 → 静态资产。
 export default {
   async fetch(request: Request, env: PortalEnv, _ctx: ExecutionContext): Promise<Response> {
