@@ -60,9 +60,9 @@ viral-sites/
     ...                   # 每个点子一个独立 Vite app
 ```
 
-- pnpm workspace；站与站之间**零依赖**，只允许依赖 `shared`
+- pnpm workspace；玩法之间**零依赖**，只允许依赖 `shared`；唯一生产组合层是 `sites/home`
 - 技术栈：Vite + React + TypeScript + Tailwind（熟手栈，不引入学习成本）
-- 每个站独立构建、独立部署，互不拖累
+- 玩法源码各自独立开发测试；生产只由 `sites/home` 统一 Vite MPA 构建、单一 Cloudflare Worker 部署（见下 §4.4）
 
 ### 4.2 共享能力一：分享卡片（工厂核心资产）
 
@@ -88,9 +88,10 @@ viral-sites/
 
 ### 4.4 部署
 
-- Cloudflare Pages，每站一个 project，`git push` 自动部署
-- 验证期用 `<站名>.pages.dev` 免费子域；保存率 > 5% 的站买独立域名
-- 无后端的站零成本；需要后端的站（如 AI 判官）用 Cloudflare Workers，免费额度内起步
+- **统一主站单一部署**：只有 `sites/home` 是生产应用（Vite MPA 输出 `/` 与 `/<玩法>/`），由一个 Cloudflare Worker（Static Assets）提供服务；不再为玩法新建 Pages/Workers 项目
+- 玩法地址是同源路径（如 `/ai-judge/`、`/salary-timer/`），禁止 iframe、禁止外部子站 URL；`sites/<玩法>` 的独立 `build` 仅作模块自检，产物不得发布
+- 历史验证期 `*.pages.dev` 站点保留只读，不再更新
+- 需要后端的玩法（AI 判官、按住不放）走同一个主站 Worker 的命名空间 API（`/api/ai-judge/*`、`/api/hold-button/*`），绑定与 secrets 只在 `sites/home/wrangler.jsonc` 声明
 
 ## 5. 变现路径（验证期不做，仅记录方向）
 

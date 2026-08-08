@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && tsc --noEmit -p worker && vitest run && vitest run --config vitest.worker.config.ts && vite build",
+    "build": "tsc --noEmit && tsc --noEmit -p worker && vitest run && vitest run --config vitest.worker.config.ts && vite build && node scripts/verify-integrated-build.mjs",
     "test": "vitest run && vitest run --config vitest.worker.config.ts",
     "test:worker": "vitest run --config vitest.worker.config.ts",
     "typecheck": "tsc --noEmit && tsc --noEmit -p worker",

@@ -36,10 +36,10 @@
 
 ## 技术栈（规划）
 
-- pnpm monorepo：`packages/shared`（卡片生成 / 埋点 / 基础 UI） + `sites/*`（每个点子一个站）
+- pnpm monorepo：`packages/shared`（卡片生成 / 埋点 / 基础 UI） + `sites/*`（每个玩法源码独立）+ `sites/home`（唯一生产主站）
 - Vite + React + TypeScript + Tailwind
-- 部署：Cloudflare Pages（免费 `*.pages.dev` 验证，爆款再买域名）
-- 统计：umami（访问 / 生成 / 保存卡片 三事件）
+- 部署：统一主站单一部署——`sites/home` 一个 Vite MPA 产物 + 一个 Cloudflare Worker（Static Assets）；玩法走同源路径 `/ai-judge/`、`/salary-timer/` 等，不再单独建 Pages/Workers 项目（历史 `*.pages.dev` 验证站保留只读）
+- 统计：umami（访问 / 生成 / 保存卡片 三事件），主站同源代理 `/api/send`
 
 ## 仓库结构
 
