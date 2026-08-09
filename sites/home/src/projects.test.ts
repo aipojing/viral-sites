@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { pickRandomProject, projects } from './projects'
 
 describe('projects', () => {
-  it('收录当前九个玩法，并全部使用同站路径', () => {
-    expect(projects).toHaveLength(9)
+  it('收录当前七个玩法，并全部使用同站路径', () => {
+    expect(projects).toHaveLength(7)
     expect(projects.map((project) => project.slug)).toEqual([
       'life-grid',
       'mental-state',
@@ -11,9 +11,7 @@ describe('projects', () => {
       'cyber-fortune',
       'refusal-generator',
       'internet-age',
-      'ai-judge',
       'next-question',
-      'salary-timer',
     ])
 
     for (const project of projects) {

@@ -92,7 +92,7 @@ describe('App', () => {
       vi.advanceTimersByTime(859)
     })
     expect(screen.getByRole('heading', { name: '赛博求签' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '选择AI 赛博判官' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: '选择下一问' })).toHaveAttribute(
       'aria-pressed',
       'true',
     )
@@ -101,7 +101,7 @@ describe('App', () => {
       vi.advanceTimersByTime(1)
     })
     expect(screen.getByRole('heading', { name: '赛博求签' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '选择下一问' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: '选择人生进度条' })).toHaveAttribute(
       'aria-pressed',
       'true',
     )
