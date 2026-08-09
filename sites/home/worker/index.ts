@@ -25,9 +25,6 @@ export default {
         return handleNextQuestionApi(request, env, ctx)
       case 'next-question-shell':
         return serveNextQuestionShell(request, env, route.slug)
-      case 'next-question-shell':
-        // Task 7 会把这里替换为带安全 metadata 的链条 HTML shell
-        return env.ASSETS.fetch(request)
       case 'rewrite': {
         const rewritten = new URL(request.url)
         rewritten.pathname = route.pathname

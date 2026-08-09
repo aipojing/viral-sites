@@ -4,7 +4,7 @@ import { defineConfig, type Plugin } from 'vite'
 import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { projects } from './src/projects'
+import { projects } from './src/projects.ts'
 
 const configDir = fileURLToPath(new URL('.', import.meta.url))
 

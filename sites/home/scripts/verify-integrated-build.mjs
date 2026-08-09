@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 
@@ -34,7 +34,37 @@ export function verifyIntegratedBuild({ rootDir, slugs }) {
     }
     checkEntryHtml(errors, path.join(rootDir, entry.slug, 'index.html'), entry.slug)
   }
+  checkCssAssetReferences(errors, rootDir)
   return errors
+}
+
+function checkCssAssetReferences(errors, rootDir) {
+  for (const cssPath of findCssFiles(rootDir)) {
+    const css = readFileSync(cssPath, 'utf8')
+    for (const match of css.matchAll(/url\(\s*(['"]?)([^'"\)]+)\1\s*\)/g)) {
+      const reference = match[2].trim()
+      if (/^(?:data:|https?:|#)/.test(reference)) continue
+
+      const pathname = reference.split(/[?#]/, 1)[0]
+      const assetPath = pathname.startsWith('/')
+        ? path.join(rootDir, pathname.slice(1))
+        : path.resolve(path.dirname(cssPath), pathname)
+
+      if (!existsSync(assetPath)) {
+        errors.push(`CSS 引用了不存在的静态资源 ${reference}（${cssPath}）`)
+      }
+    }
+  }
+}
+
+function findCssFiles(rootDir) {
+  const files = []
+  for (const entry of readdirSync(rootDir, { withFileTypes: true })) {
+    const entryPath = path.join(rootDir, entry.name)
+    if (entry.isDirectory()) files.push(...findCssFiles(entryPath))
+    else if (entry.isFile() && entry.name.endsWith('.css')) files.push(entryPath)
+  }
+  return files
 }
 
 function checkEntryHtml(errors, htmlPath, label) {

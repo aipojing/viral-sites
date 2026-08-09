@@ -1,3 +1,5 @@
+// @vitest-environment node
+
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
@@ -42,6 +44,20 @@ describe('verifyIntegratedBuild', () => {
     expect(
       verifyIntegratedBuild({ rootDir: distDir, slugs: ['life-grid', 'ai-judge'] }),
     ).toEqual([])
+  })
+
+  it('CSS 引用不存在的静态资源时报错', () => {
+    const distDir = makeDist({})
+    const assetsDir = path.join(distDir, 'assets')
+    mkdirSync(assetsDir, { recursive: true })
+    writeFileSync(
+      path.join(assetsDir, 'home.css'),
+      '.hero { background-image: url("/missing-home-visual.png"); }',
+    )
+
+    const errors = verifyIntegratedBuild({ rootDir: distDir, slugs: [] })
+
+    expect(errors.some((error) => error.includes('missing-home-visual.png'))).toBe(true)
   })
 
   it('缺少玩法 HTML 页面时报错', () => {

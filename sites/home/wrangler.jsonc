@@ -2,8 +2,8 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "guaihaowan",
   "main": "worker/index.ts",
-  // 实施当天（2026-08-09）的真实日期
-  "compatibility_date": "2026-08-09",
+  // 对齐当前 Wrangler 内置 workerd 支持的最新日期，保证默认 wrangler dev 可启动。
+  "compatibility_date": "2026-08-08",
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
