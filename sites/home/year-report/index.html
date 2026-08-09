@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b0a1f" />
+    <title>年度报告 — 怪好玩</title>
+    <meta name="description" content="十个问题，三分钟写完自己的年度报告。答案只留在这台设备上，分享时逐项勾选公开内容。" />
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <script>
+      // 分享链接的内容全部在 # 之后，绝不会随请求发给服务器。
+      // 这段同步脚本必须先于任何统计与业务代码执行：先把 fragment 收进内存，
+      // 再立刻从地址栏抹掉，避免 page_view 的 path、referrer 或截图带上别人的答案。
+      window.__YEAR_REPORT_FRAGMENT__ = window.location.hash
+      if (window.location.hash) {
+        history.replaceState(null, '', window.location.pathname + window.location.search)
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/experience-entry.tsx"></script>
+  </body>
+</html>

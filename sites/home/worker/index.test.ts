@@ -56,8 +56,19 @@ describe('portal worker entry', () => {
         '',
         '',
         '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
       ],
-      doubles: [1, 0, 0, 0, 34, 0],
+      doubles: [1, 0, 0, 0, 34, 0, 0, 0, 0],
     })
   })
 
@@ -96,6 +107,17 @@ describe('portal worker entry', () => {
           '',
           '',
           '5to15m',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
         ],
       }),
     )
@@ -122,6 +144,17 @@ describe('portal worker entry', () => {
         blobs: [
           'time_ledger_generated',
           '/life-grid/',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
           '',
           '',
           '',
@@ -182,14 +215,25 @@ describe('portal worker entry', () => {
           '',
           '',
           '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
         ],
       }),
     )
   })
 
-  it('文书模式切换与编辑后复制事件被接受', async () => {
+  it('文书模式切换、编辑后复制与安全降级事件被接受', async () => {
     const { env, writeDataPoint } = makeEnv()
-    for (const event of ['mode_selected', 'edited_before_copy'] as const) {
+    for (const event of ['mode_selected', 'edited_before_copy', 'safety_mode'] as const) {
       const response = await worker.fetch(
         new Request('https://example.com/api/events', {
           method: 'POST',
@@ -205,7 +249,256 @@ describe('portal worker entry', () => {
       )
       expect(response.status).toBe(202)
     }
-    expect(writeDataPoint).toHaveBeenCalledTimes(2)
+    expect(writeDataPoint).toHaveBeenCalledTimes(3)
+  })
+
+  it('按住不放挑战事件只记录桶与枚举，不携带精确时长与 token', async () => {
+    const { env, writeDataPoint } = makeEnv()
+    const response = await worker.fetch(
+      new Request('https://example.com/api/events', {
+        method: 'POST',
+        body: JSON.stringify({
+          event: 'challenge_finished',
+          data: { bucket: 23, reason: 'released', device: 'touch', token: 'secret-token' },
+          path: '/hold-button/',
+          sessionId: 'session-123',
+        }),
+      }),
+      env,
+      ctx,
+    )
+
+    expect(response.status).toBe(202)
+    expect(writeDataPoint).toHaveBeenCalledWith({
+      indexes: ['session-123'],
+      blobs: [
+        'challenge_finished',
+        '/hold-button/',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        'released',
+        'touch',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+      ],
+      doubles: [1, 0, 0, 0, 0, 0, 23, 0, 0],
+    })
+  })
+
+  it('一秒钟世界事件只记录章节/来源 id 与时长桶，不携带精确秒数', async () => {
+    const { env, writeDataPoint } = makeEnv()
+    const response = await worker.fetch(
+      new Request('https://example.com/api/events', {
+        method: 'POST',
+        body: JSON.stringify({
+          event: 'chapter_viewed',
+          data: { chapter: 'planet', seconds: 47 },
+          path: '/one-second-world/',
+          sessionId: 'session-123',
+        }),
+      }),
+      env,
+      ctx,
+    )
+
+    expect(response.status).toBe(202)
+    expect(writeDataPoint).toHaveBeenCalledWith({
+      indexes: ['session-123'],
+      blobs: [
+        'chapter_viewed',
+        '/one-second-world/',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        'planet',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+      ],
+      doubles: [1, 0, 0, 0, 0, 0, 0, 0, 0],
+    })
+  })
+
+  it('亲戚称呼事件只记录枚举 token 与方法，不携带关系链原文', async () => {
+    const { env, writeDataPoint } = makeEnv()
+    const response = await worker.fetch(
+      new Request('https://example.com/api/events', {
+        method: 'POST',
+        body: JSON.stringify({
+          event: 'relation_step_added',
+          data: { relation: 'older-brother', path: 'mother>older-brother' },
+          path: '/kinship-calculator/',
+          sessionId: 'session-123',
+        }),
+      }),
+      env,
+      ctx,
+    )
+
+    expect(response.status).toBe(202)
+    const call = writeDataPoint.mock.calls[0][0] as { blobs: string[] }
+    expect(call.blobs[0]).toBe('relation_step_added')
+    expect(call.blobs[21]).toBe('older-brother')
+    // 关系链原文没有对应列，不会落库
+    expect(call.blobs.join('\u0001')).not.toContain('mother>older-brother')
+  })
+
+  it('亲戚称呼纠错与反查事件被接受，方式枚举落 method 列', async () => {
+    const { env, writeDataPoint } = makeEnv()
+    for (const [event, data] of [
+      ['query_started', { mode: 'popular' }],
+      ['query_resolved', {}],
+      ['query_unresolved', { reason: 'not-covered' }],
+      ['reverse_used', { method: 'hit' }],
+      ['region_pack_used', { region: 'pack-yue' }],
+      ['correction_submitted', { method: 'copy' }],
+    ] as const) {
+      const response = await worker.fetch(
+        new Request('https://example.com/api/events', {
+          method: 'POST',
+          body: JSON.stringify({
+            event,
+            data,
+            path: '/kinship-calculator/',
+            sessionId: 'session-123',
+          }),
+        }),
+        env,
+        ctx,
+      )
+      expect(response.status).toBe(202)
+    }
+    expect(writeDataPoint).toHaveBeenCalledTimes(6)
+  })
+
+  it('一秒钟世界来源、时长桶与快照事件被接受且不带精确时长', async () => {
+    const { env, writeDataPoint } = makeEnv()
+    for (const [event, data] of [
+      ['source_opened', { source: 'osw-cn-express' }],
+      ['engaged_time_bucket', { bucket: '45_119' }],
+      ['snapshot_generated', { duration_bucket: 'gte120' }],
+    ] as const) {
+      const response = await worker.fetch(
+        new Request('https://example.com/api/events', {
+          method: 'POST',
+          body: JSON.stringify({
+            event,
+            data,
+            path: '/one-second-world/',
+            sessionId: 'session-123',
+          }),
+        }),
+        env,
+        ctx,
+      )
+      expect(response.status).toBe(202)
+    }
+    expect(writeDataPoint).toHaveBeenCalledTimes(3)
+  })
+
+  it('年度报告答题事件只落题号与 answered|skipped，答案原文不落库', async () => {
+    const { env, writeDataPoint } = makeEnv()
+    const response = await worker.fetch(
+      new Request('https://example.com/api/events', {
+        method: 'POST',
+        body: JSON.stringify({
+          event: 'question_completed',
+          data: { question: 'keyword', skipped: 'answered', text: '重启' },
+          path: '/year-report/',
+          sessionId: 'session-123',
+        }),
+      }),
+      env,
+      ctx,
+    )
+
+    expect(response.status).toBe(202)
+    const call = writeDataPoint.mock.calls[0][0] as { blobs: string[]; doubles: number[] }
+    expect(call.blobs[0]).toBe('question_completed')
+    expect(call.blobs[24]).toBe('keyword')
+    expect(call.blobs[25]).toBe('answered')
+    // 答案原文没有对应列，不会被默默写进去
+    expect(call.blobs.join('\u0001')).not.toContain('重启')
+  })
+
+  it('年度报告分享事件只落字段数量与版本号', async () => {
+    const { env, writeDataPoint } = makeEnv()
+    const response = await worker.fetch(
+      new Request('https://example.com/api/events', {
+        method: 'POST',
+        body: JSON.stringify({
+          event: 'share_report_opened',
+          data: { field_count: 4, version: 1, answers: { keyword: '重启' } },
+          path: '/year-report/',
+          sessionId: 'session-123',
+        }),
+      }),
+      env,
+      ctx,
+    )
+
+    expect(response.status).toBe(202)
+    const call = writeDataPoint.mock.calls[0][0] as { blobs: string[]; doubles: number[] }
+    expect(call.doubles[7]).toBe(4)
+    expect(call.doubles[8]).toBe(1)
+    expect(JSON.stringify(call)).not.toContain('重启')
+  })
+
+  it('年度报告开始、草稿与建链事件全部被接受', async () => {
+    const { env, writeDataPoint } = makeEnv()
+    for (const [event, data] of [
+      ['report_started', { mode: 'no-draft' }],
+      ['draft_resumed', {}],
+      ['draft_cleared', {}],
+      ['share_link_created', { field_count: 5, version: 1 }],
+      ['save_image', { card: 'year-report', field_count: 4 }],
+    ] as const) {
+      const response = await worker.fetch(
+        new Request('https://example.com/api/events', {
+          method: 'POST',
+          body: JSON.stringify({ event, data, path: '/year-report/', sessionId: 'session-123' }),
+        }),
+        env,
+        ctx,
+      )
+      expect(response.status).toBe(202)
+    }
+    expect(writeDataPoint).toHaveBeenCalledTimes(5)
   })
 
   it('拒绝未知事件且不写入统计', async () => {
@@ -273,12 +566,54 @@ describe('portal worker entry', () => {
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
-  it('尚未接入的玩法 API 返回 503 feature_unavailable', async () => {
+  it('按住不放 API 已接入：预算开关关闭时返回 scores_disabled', async () => {
     const { env } = makeEnv()
 
-    const hold = await worker.fetch(new Request('https://example.com/api/hold-button/session'), env, ctx)
-    expect(hold.status).toBe(503)
-    expect(await hold.json()).toEqual({ code: 'feature_unavailable', feature: 'hold-button' })
+    const response = await worker.fetch(
+      new Request('https://example.com/api/hold-button/session', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ deviceType: 'touch' }),
+      }),
+      env,
+      ctx,
+    )
+
+    expect(response.status).toBe(503)
+    expect(await response.json()).toEqual({ code: 'scores_disabled' })
+  })
+
+  it('按住不放未知子路由返回 JSON 404，不回退 HTML', async () => {
+    const { env, fetchMock } = makeEnv()
+
+    const response = await worker.fetch(new Request('https://example.com/api/hold-button/nope'), env, ctx)
+
+    expect(response.status).toBe(404)
+    expect(await response.json()).toEqual({ code: 'not_found' })
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('scheduled 清理依次删除 sessions、runs 与过期 histogram', async () => {
+    const statements: string[] = []
+    const db = {
+      prepare: (sql: string) => ({
+        bind: () => ({ run: async () => void statements.push(sql) }),
+      }),
+    }
+    const { env } = makeEnv()
+    const holdEnv = { ...env, HOLD_DB: db } as unknown as PortalEnv
+
+    await worker.scheduled({} as ScheduledEvent, holdEnv, ctx)
+
+    expect(statements).toHaveLength(3)
+    expect(statements[0]).toContain('DELETE FROM sessions')
+    expect(statements[1]).toContain('DELETE FROM runs')
+    expect(statements[2]).toContain('DELETE FROM daily_histogram')
+  })
+
+  it('未配置 D1 时 scheduled 清理静默跳过', async () => {
+    const { env } = makeEnv()
+    await expect(worker.scheduled({} as ScheduledEvent, env, ctx)).resolves.toBeUndefined()
   })
 
   it('深链接改写为玩法页并保留 query 后交给静态资产', async () => {

@@ -27,6 +27,11 @@
       "simple": { "limit": 10, "period": 60 }
     }
   ],
+  // 按住不放成本熔断：只有 'true' 且 HOLD_DB/HOLD_SESSION_SECRET 齐备时开放服务端成绩。
+  // HOLD_DB（d1_databases）与 HOLD_SUBMIT_LIMITER 需生产创建后由人工授权写入，不在此伪造 id。
+  "vars": { "HOLD_SCORES_ENABLED": "false" },
+  // 每日清理 hold-button 的过期 sessions / runs / histogram（UTC 18:00 ≈ 北京 02:00）。
+  "triggers": { "crons": ["0 18 * * *"] },
   "exports": {
     "NextQuestionChain": { "type": "durable-object", "storage": "sqlite" }
   },

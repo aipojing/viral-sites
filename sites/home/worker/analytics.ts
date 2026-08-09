@@ -31,9 +31,10 @@ const ALLOWED_EVENTS = new Set([
   'tone_selected',
   'custom_scene_opened',
   'custom_scene_submitted',
-  // 道歉与请假（refusal-generator 文书模式）：只记录枚举，不携带称呼/事由/正文
+  // 道歉与请假（refusal-generator 文书模式）：只记录枚举，不携带称呼/事由/正文，命中词不上报
   'mode_selected',
   'edited_before_copy',
+  'safety_mode',
   'challenge_opened',
   'challenge_completed',
   'link_invalid',
@@ -52,6 +53,32 @@ const ALLOWED_EVENTS = new Set([
   'next_question_completed',
   'next_question_result_saved',
   'next_question_redacted',
+  // 按住不放：属性只允许 bucket/reason/device/channel，禁止携带精确时长与 token
+  'challenge_started',
+  'challenge_finished',
+  'challenge_shared',
+  // 一秒钟世界：属性只允许章节 id、事实 id 与时长桶，禁止携带精确秒数与滚动轨迹
+  'chapter_viewed',
+  'source_opened',
+  'engaged_time_bucket',
+  'snapshot_generated',
+  // 亲戚称呼：属性只允许枚举 token、entry id、地区 id 与方式枚举，
+  // 禁止携带关系链原文、反查输入原文与用户姓名
+  'query_started',
+  'query_resolved',
+  'query_unresolved',
+  'relation_step_added',
+  'reverse_used',
+  'region_pack_used',
+  'correction_submitted',
+  // 年度报告：属性只允许题号、answered|skipped 枚举、开启方式与公开字段数量，
+  // 绝不携带任何答案原文、分享 fragment 或草稿内容
+  'report_started',
+  'question_completed',
+  'draft_resumed',
+  'draft_cleared',
+  'share_link_created',
+  'share_report_opened',
 ])
 
 type EventData = Record<string, unknown>
@@ -141,6 +168,21 @@ function writeProductEvent(env: PortalEnv, payload: ProductEventPayload): void {
       stringDimension(data, 'id'),
       // 上班回本：scene_finished 的时长桶，只允许枚举值
       stringDimension(data, 'duration_bucket'),
+      // 按住不放：结束原因 / 设备类型 / 分享渠道枚举，精确时长只进 bucket double
+      stringDimension(data, 'reason'),
+      stringDimension(data, 'device'),
+      stringDimension(data, 'channel'),
+      // 一秒钟世界：章节 id / 事实 id / 停留时长桶枚举，不携带精确秒数
+      stringDimension(data, 'chapter'),
+      stringDimension(data, 'source'),
+      stringDimension(data, 'bucket'),
+      // 亲戚称呼：关系 token 枚举 / 地区包 id / 方式枚举（hit|miss、form|copy）
+      stringDimension(data, 'relation'),
+      stringDimension(data, 'region'),
+      stringDimension(data, 'method'),
+      // 年度报告：题号与 answered|skipped 枚举，答案原文没有对应列
+      stringDimension(data, 'question'),
+      stringDimension(data, 'skipped'),
     ],
     doubles: [
       1,
@@ -149,6 +191,11 @@ function writeProductEvent(env: PortalEnv, payload: ProductEventPayload): void {
       numberMetric(data, 'duration_seconds'),
       numberMetric(data, 'age'),
       numberMetric(data, 'streak'),
+      // 按住不放：秒级时长桶（0～1200），不是精确毫秒
+      numberMetric(data, 'bucket'),
+      // 年度报告：公开字段数量（0～10）与分享格式版本号
+      numberMetric(data, 'field_count'),
+      numberMetric(data, 'version'),
     ],
   })
 }

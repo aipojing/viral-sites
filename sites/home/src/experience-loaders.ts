@@ -10,6 +10,10 @@ export type ExperienceSlug =
   | 'ai-judge'
   | 'next-question'
   | 'salary-timer'
+  | 'hold-button'
+  | 'one-second-world'
+  | 'kinship-calculator'
+  | 'year-report'
 
 export type ExperienceLoader = () => Promise<ComponentType>
 
@@ -75,6 +79,34 @@ export const experienceLoaders: Readonly<Record<ExperienceSlug, ExperienceLoader
     const [module] = await Promise.all([
       import('../../salary-timer/src/app'),
       import('../../salary-timer/src/index.css'),
+    ])
+    return module.App
+  },
+  'hold-button': async () => {
+    const [module] = await Promise.all([
+      import('../../hold-button/src/app'),
+      import('../../hold-button/src/index.css'),
+    ])
+    return module.App
+  },
+  'one-second-world': async () => {
+    const [module] = await Promise.all([
+      import('../../one-second-world/src/app'),
+      import('../../one-second-world/src/index.css'),
+    ])
+    return module.App
+  },
+  'kinship-calculator': async () => {
+    const [module] = await Promise.all([
+      import('../../kinship-calculator/src/app'),
+      import('../../kinship-calculator/src/index.css'),
+    ])
+    return module.App
+  },
+  'year-report': async () => {
+    const [module] = await Promise.all([
+      import('../../year-report/src/app'),
+      import('../../year-report/src/index.css'),
     ])
     return module.App
   },

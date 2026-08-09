@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { pickRandomProject, projects } from './projects'
 
 describe('projects', () => {
-  it('收录当前九个玩法，并全部使用同站路径', () => {
-    expect(projects).toHaveLength(9)
+  it('收录当前十三个玩法，并全部使用同站路径', () => {
+    expect(projects).toHaveLength(13)
     expect(projects.map((project) => project.slug)).toEqual([
       'life-grid',
       'mental-state',
@@ -14,12 +14,19 @@ describe('projects', () => {
       'ai-judge',
       'next-question',
       'salary-timer',
+      'hold-button',
+      'one-second-world',
+      'kinship-calculator',
+      'year-report',
     ])
 
     for (const project of projects) {
       expect(project.href).toBe(`/${project.slug}/`)
       expect(project.href).not.toMatch(/^https?:\/\//)
     }
+    expect(projects.find((project) => project.slug === 'one-second-world')?.href).toBe(
+      '/one-second-world/',
+    )
   })
 
   it('每个入口都有完整且唯一的导航信息', () => {
