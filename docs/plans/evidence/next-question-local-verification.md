@@ -50,6 +50,25 @@
 ## 已知非阻塞问题
 
 1. 本地 `wrangler dev` 需 `--compatibility-date 2026-08-01`：本机 workerd（1.20260801.1）尚不支持配置中的 2026-08-09；`deploy:dry` 与生产不受影响。
-2. 并行会话的 ai-judge / 主站重做工作（projects.ts、app.test.tsx 等）在验证期间仍未提交；HEAD 的 home 构建依赖该会话后续提交，与本功能无关。
-3. 基线曾有的 ai-judge `verdict-schema` 失败由用户并行会话在运行期间自行修复，非本功能造成。
-4. 未执行：生产部署、Cloudflare 远程操作、微信真机测试。
+2. 基线曾有的 ai-judge `verdict-schema` 失败由用户并行会话在运行期间自行修复，非本功能造成。
+3. 未执行：生产部署、Cloudflare 远程操作、微信真机测试。
+
+## 干净检出补验（2026-08-09 追加，提交 4be40be / c15772f）
+
+外部验收指出：远端干净检出无法构建主站（缺 `sites/home/tsconfig.json`、`src/projects.ts`、`test/setup.ts`、`src/main.tsx` 等未提交文件），且 tacit-test 发送的 `link_invalid` 不在白名单。已修复并用 `git worktree add --detach` 的干净检出复验：
+
+- 提交主站门户前端基础设施（tsconfig、test/setup、main/app/index.css/experience-shell.css/projects 及其测试等），使 `pnpm --filter @viral/home build` 可从干净源码完成。
+- 已提交注册表只保留 HEAD 已跟踪的七个玩法入口；并行会话未跟踪的 ai-judge / salary-timer 入口与 loader 从提交版注册表中剔除（其工作树改动保留，由该会话自行提交），避免干净检出引用缺失文件。
+- 白名单补 `link_invalid`（tacit-test 已在发），干净树实测 `POST /api/events`：`link_invalid` → 202、未收录事件 → 400。
+
+干净检出自 `4be40be`/`c15772f` 起的实测结果：
+
+| 命令（于干净 worktree） | 结果 |
+|------|------|
+| `pnpm --filter @viral/home typecheck` | 退出码 0 |
+| `pnpm --filter @viral/home test` | 4 files / 17 tests 通过 |
+| `pnpm --filter @viral/home test:worker` | 10 files / 100 tests 通过 |
+| `pnpm --filter @viral/home build` | 退出码 0 |
+| `pnpm --filter @viral/home deploy:dry` | 退出码 0 |
+| `pnpm test`（全仓库） | 退出码 0 |
+| `pnpm typecheck`（全仓库） | 退出码 0 |
