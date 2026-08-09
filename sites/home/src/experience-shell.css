@@ -1,0 +1,50 @@
+.portal-home-link {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  left: max(12px, env(safe-area-inset-left));
+  z-index: 9999;
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 13px;
+  color: #f5f8ff;
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  text-decoration: none;
+  background: rgb(3 10 24 / 0.86);
+  border: 1px solid rgb(125 165 255 / 0.72);
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.22);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.portal-home-link:hover {
+  background: #1557ff;
+  transform: translateY(-2px);
+}
+
+.portal-home-link:focus-visible {
+  outline: 3px solid #cfff00;
+  outline-offset: 3px;
+}
+
+.portal-home-link svg {
+  width: 17px;
+  height: 17px;
+}
+
+@media (max-width: 520px) {
+  .portal-home-link span {
+    display: none;
+  }
+
+  .portal-home-link {
+    width: 40px;
+    padding: 0;
+    justify-content: center;
+  }
+}

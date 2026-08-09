@@ -19,6 +19,7 @@ const ALLOWED_EVENTS = new Set([
   'custom_scene_submitted',
   'challenge_opened',
   'challenge_completed',
+  'link_invalid',
   'challenge_create',
   'challenge_complete',
   'question_chain_create',
