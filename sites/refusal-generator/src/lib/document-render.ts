@@ -1,5 +1,13 @@
 import { renderOptionalTemplate, type TemplateValues } from '@viral/shared'
+import type { DocumentType } from '../configs/document-types'
 import type { DocumentKind, DocumentTemplate } from './document-schema'
+
+export interface DocumentSelection {
+  type: DocumentType
+  scene: string
+  audience: string
+  tone: string
+}
 
 export interface DocumentValues {
   addressee?: string

@@ -487,3 +487,28 @@ export const ENABLED_DOCUMENT_CELLS: readonly DocumentCell[] = [
     JOKE_TONES.map((tone): DocumentCell => ({ type, scene, audience, tone })),
   ),
 ]
+
+// 选择器只暴露启用矩阵里存在的选项，避免选到没有内容的组合。
+export function enabledScenes(type: DocumentType): readonly string[] {
+  return [...new Set(ENABLED_DOCUMENT_CELLS.filter((c) => c.type === type).map((c) => c.scene))]
+}
+
+export function enabledAudiences(type: DocumentType, scene: string): readonly string[] {
+  return [
+    ...new Set(
+      ENABLED_DOCUMENT_CELLS.filter((c) => c.type === type && c.scene === scene).map((c) => c.audience),
+    ),
+  ]
+}
+
+export function enabledTones(type: DocumentType, scene: string, audience: string): readonly string[] {
+  return ENABLED_DOCUMENT_CELLS.filter(
+    (c) => c.type === type && c.scene === scene && c.audience === audience,
+  ).map((c) => c.tone)
+}
+
+export function templatesFor(cell: DocumentCell): readonly DocumentTemplate[] {
+  return DOCUMENT_TEMPLATES.filter(
+    (t) => t.type === cell.type && t.scene === cell.scene && t.audience === cell.audience && t.tone === cell.tone,
+  )
+}
