@@ -10,14 +10,16 @@
 
 详见 [docs/00-factory-design.md](docs/00-factory-design.md)。
 
+生产主站：[guaihaowan.xueban-ai.workers.dev](https://guaihaowan.xueban-ai.workers.dev)
+
 ## 站点路线图
 
 | # | 站点 | 一句话 | 形态 | 状态 |
 |---|------|--------|------|------|
-| 01 | [人生进度条](docs/01-life-grid.md) | 输入生日，看你的人生还剩多少个格子 | 纯前端 | 🚀 [已上线](https://life-grid-7on.pages.dev)（统计已接入，真机四环境验收待办） |
-| 02 | [精神状态检测](docs/02-mental-state-check.md) | 8 道题测出你的班味浓度（系列化模板） | 纯前端 | 📐 设计完成，第二发 |
-| 03 | [AI 赛博判官](docs/03-ai-judge.md) | 报上名来，AI 给你写一张毒舌判词 | 轻后端 + LLM | 📐 设计完成，第三发 |
-| 04 | [上班回本计算器](docs/04-salary-timer.md) | 实时跳动：这次带薪如厕价值 ¥3.2 | 纯前端 | 📐 设计完成，待触发 |
+| 01 | [人生进度条](docs/01-life-grid.md) | 输入生日，看你的人生还剩多少个格子 | 纯前端 | 🚀 [统一主站已上线](https://guaihaowan.xueban-ai.workers.dev/life-grid/) |
+| 02 | [精神状态检测](docs/02-mental-state-check.md) | 8 道题测出你的班味浓度（系列化模板） | 纯前端 | 🚀 [统一主站已上线](https://guaihaowan.xueban-ai.workers.dev/mental-state/) |
+| 03 | [AI 赛博判官](docs/03-ai-judge.md) | 报上名来，AI 给你写一张毒舌判词 | 轻后端 + LLM | 🚀 [统一主站已上线](https://guaihaowan.xueban-ai.workers.dev/ai-judge/)（未配置模型时使用安全兜底判词） |
+| 04 | [上班回本计算器](docs/04-salary-timer.md) | 实时跳动：这次带薪如厕价值 ¥3.2 | 纯前端 | 🚀 [统一主站已上线](https://guaihaowan.xueban-ai.workers.dev/salary-timer/) |
 
 ### 候选池（已出设计文档，未排期）
 
@@ -38,7 +40,7 @@
 
 - pnpm monorepo：`packages/shared`（卡片生成 / 埋点 / 基础 UI） + `sites/*`（每个玩法源码独立）+ `sites/home`（唯一生产主站）
 - Vite + React + TypeScript + Tailwind
-- 部署：统一主站单一部署——`sites/home` 一个 Vite MPA 产物 + 一个 Cloudflare Worker（Static Assets）；玩法走同源路径 `/ai-judge/`、`/salary-timer/` 等，不再单独建 Pages/Workers 项目（历史 `*.pages.dev` 验证站保留只读）
+- 部署：统一主站单一部署——`sites/home` 一个 Vite MPA 产物 + 一个 Cloudflare Worker（Static Assets）；玩法走同源路径 `/ai-judge/`、`/salary-timer/` 等，不再单独建 Pages/Workers 项目；历史 `life-grid` Pages 项目已删除
 - 统计：Cloudflare Analytics Engine（访问 / 生成 / 保存卡片等第一方事件），主站同源接收 `/api/events`
 
 ## 仓库结构
@@ -46,8 +48,8 @@
 ```
 viral-sites/
   docs/            # 设计文档（当前阶段的全部产出）
-  packages/        # （待开发）共享能力包
-  sites/           # （待开发）各站点
+  packages/        # 共享能力包
+  sites/           # 各玩法源码与唯一生产主站
 ```
 
-当前阶段：**首发站已上线**（工厂基建 `packages/shared` + `sites/life-grid`），其余站点在候选池排队。
+当前阶段：**统一主站已上线**，一次部署提供首页、9 个玩法、第一方产品统计和需要后端的玩法 API。
