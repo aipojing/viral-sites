@@ -1,0 +1,147 @@
+@import 'tailwindcss';
+@source '.';
+
+/* 按住不放：像素街机。深空蓝 / 霓虹黄 / 像素硬阴影 */
+:root {
+  color-scheme: dark;
+  --hb-bg: #0b1026;
+  --hb-panel: #131a3a;
+  --hb-ink: #f4f6ff;
+  --hb-ink-soft: #8b93b8;
+  --hb-accent: #ffe600;
+  --hb-danger: #ff5d73;
+}
+
+body {
+  background-color: var(--hb-bg);
+  color: var(--hb-ink);
+  font-family: -apple-system, 'PingFang SC', 'Noto Sans SC', system-ui, sans-serif;
+}
+
+/* 像素网格背景：静态纹理，无动画 */
+.hb-screen {
+  background:
+    radial-gradient(120% 50% at 50% 0%, rgba(255, 230, 0, 0.07), transparent 60%),
+    repeating-linear-gradient(0deg, rgba(244, 246, 255, 0.03) 0 1px, transparent 1px 8px),
+    repeating-linear-gradient(90deg, rgba(244, 246, 255, 0.03) 0 1px, transparent 1px 8px),
+    var(--hb-bg);
+}
+
+.hb-card {
+  background: var(--hb-panel);
+  border: 3px solid #2a3566;
+  box-shadow: 0 6px 0 #05081a;
+}
+
+.hb-pixel-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 11px;
+  letter-spacing: 0.35em;
+  color: var(--hb-accent);
+  border: 2px solid currentColor;
+  box-shadow: 2px 2px 0 rgba(255, 230, 0, 0.35);
+}
+
+.hb-button {
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #141000;
+  background: var(--hb-accent);
+  border: 3px solid #141000;
+  box-shadow: 0 5px 0 #7a6c00;
+  touch-action: manipulation;
+}
+
+.hb-button:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #7a6c00;
+}
+
+.hb-button:focus-visible,
+.hb-zone:focus-visible {
+  outline: 3px dashed var(--hb-accent);
+  outline-offset: 4px;
+}
+
+.hb-button--ghost {
+  color: var(--hb-accent);
+  background: transparent;
+  border: 3px solid var(--hb-accent);
+  box-shadow: 0 5px 0 rgba(255, 230, 0, 0.25);
+}
+
+.hb-fallback,
+.hb-hint {
+  font-size: 13px;
+  text-align: center;
+  color: var(--hb-ink-soft);
+}
+
+.hb-countdown {
+  font-size: 96px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--hb-accent);
+  text-shadow: 4px 4px 0 rgba(255, 230, 0, 0.25);
+  font-variant-numeric: tabular-nums;
+}
+
+.hb-duration {
+  font-size: 56px;
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--hb-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 380px) {
+  .hb-duration {
+    font-size: 64px;
+  }
+}
+
+/* 按压区：touch-action:none 阻止滚动，允许区域内滑动 */
+.hb-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(78vw, 320px);
+  aspect-ratio: 1;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--hb-accent);
+  background: radial-gradient(circle at 50% 38%, #1c2550, var(--hb-panel) 72%);
+  border: 4px solid var(--hb-accent);
+  box-shadow:
+    0 0 0 4px #05081a,
+    0 0 28px rgba(255, 230, 0, 0.35);
+  border-radius: 16px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: pointer;
+}
+
+.hb-zone:active {
+  transform: scale(0.97);
+  box-shadow:
+    0 0 0 4px #05081a,
+    0 0 44px rgba(255, 230, 0, 0.55);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .hb-button:active,
+  .hb-zone:active {
+    transform: none;
+  }
+}
