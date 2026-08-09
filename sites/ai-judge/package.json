@@ -4,11 +4,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && tsc --noEmit -p worker && vite build",
+    "build": "tsc --noEmit && tsc --noEmit -p worker && tsc --noEmit -p scripts && vite build",
+    "evaluate:provider": "tsx scripts/evaluate-provider.ts",
     "test": "pnpm test:ui && pnpm test:worker",
     "test:ui": "vitest run --config vitest.config.ts --passWithNoTests",
     "test:worker": "pnpm --filter @viral/home test:worker -- ../ai-judge/worker",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p worker"
+    "typecheck": "tsc --noEmit && tsc --noEmit -p worker && tsc --noEmit -p scripts"
   },
   "dependencies": {
     "@viral/shared": "workspace:*",
@@ -21,6 +22,7 @@
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^26.1.2",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.0.5",

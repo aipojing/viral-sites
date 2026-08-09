@@ -26,7 +26,7 @@ describe('App', () => {
     }
     expect(screen.getByText('你的精神网龄')).toBeInTheDocument()
     expect(screen.getByText('34')).toBeInTheDocument()
-    expect(screen.getByText('本卷判定：QQ空间贵族')).toBeInTheDocument()
+    expect(screen.getAllByText('QQ空间贵族')).toHaveLength(2)
     const events = analyticsSpy.mock.calls.map((c) => c[0])
     expect(events.filter((e) => e === 'q_answered')).toHaveLength(8)
     expect(analyticsSpy).toHaveBeenCalledWith('q_answered', { slug: 'wang-gan', q: 1 })

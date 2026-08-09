@@ -34,6 +34,8 @@ describe('makeReportCardDraw', () => {
     expect(texts).toContain('100%')
     expect(texts).toContain('班味十级学者')
     expect(texts).toContain('班味浓度检测 · viral-sites')
+    expect(texts.some((text) => text.includes('检测项目'))).toBe(false)
+    expect(texts.some((text) => text.includes('样本编号'))).toBe(false)
   })
 
   it('锐评与解药逐行绘制（换行后仍完整覆盖原文）', () => {

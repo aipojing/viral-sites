@@ -25,7 +25,6 @@ export function LandingScreen({ config, onStart }: Props) {
         <p className="mt-2">
           8 道梗题 · 60 秒 · 出具成分报告：几成贴吧遗老、几成 QQ 空间贵族、几成小红书新贵。
         </p>
-        <p className="mt-2 text-xs text-[#888888]">（满分 100 · 不设及格线 · 禁止代考）</p>
       </div>
       <button type="button" onClick={onStart} className="y2k-btn py-4 text-lg">
         开始答卷

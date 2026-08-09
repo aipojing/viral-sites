@@ -12,6 +12,7 @@ describe('ReportScreen', () => {
     render(<ReportScreen config={banWeiConfig} result={HIGH} onRestart={() => {}} />)
     expect(screen.getByText('100%')).toBeInTheDocument()
     expect(screen.getByText('班味十级学者')).toBeInTheDocument()
+    expect(screen.queryByText(/样本编号/)).not.toBeInTheDocument()
   })
 
   it('渲染 3 条锐评与解药', () => {

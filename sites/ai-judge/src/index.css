@@ -1,1 +1,164 @@
 @import 'tailwindcss';
+
+/* AI 判官：仿古判牍 + 赛博扫描线。米黄纸 / 墨黑 / 印泥红 */
+:root {
+  --aj-paper: #f3e8ca;
+  --aj-paper-deep: #eaddb5;
+  --aj-ink: #26200f;
+  --aj-ink-soft: #5c5133;
+  --aj-seal: #b3261e;
+}
+
+.aj-root {
+  min-height: 100dvh;
+  background:
+    radial-gradient(120% 60% at 50% 0%, rgba(179, 38, 30, 0.08), transparent 60%),
+    var(--aj-paper);
+  color: var(--aj-ink);
+}
+
+/* 赛博扫描线：低透明度装饰，尊重 reduced-motion（静态纹理） */
+.aj-scanlines::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(38, 32, 15, 0.05) 0,
+    rgba(38, 32, 15, 0.05) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  animation: aj-scan 8s linear infinite;
+}
+
+@keyframes aj-scan {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aj-scanlines::before {
+    animation: none;
+  }
+}
+
+.aj-card {
+  background: linear-gradient(180deg, #f8efd6, var(--aj-paper-deep));
+  border: 2px solid var(--aj-ink);
+  box-shadow: 4px 4px 0 rgba(38, 32, 15, 0.9);
+}
+
+.aj-seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--aj-seal);
+  color: var(--aj-seal);
+  border-radius: 6px;
+  transform: rotate(-6deg);
+  padding: 0.35em 0.6em;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  opacity: 0.92;
+}
+
+.aj-input {
+  width: 100%;
+  background: rgba(255, 252, 240, 0.85);
+  border: 2px solid var(--aj-ink);
+  border-radius: 2px;
+  padding: 0.75rem 0.875rem;
+  font-size: 1rem;
+  color: var(--aj-ink);
+}
+
+.aj-input:focus-visible {
+  outline: 3px solid var(--aj-seal);
+  outline-offset: 2px;
+}
+
+.aj-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  border: 2px solid var(--aj-ink);
+  background: var(--aj-ink);
+  color: #f8efd6;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  padding: 0.9rem 1rem;
+  box-shadow: 4px 4px 0 rgba(179, 38, 30, 0.85);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.aj-btn:focus-visible {
+  outline: 3px solid var(--aj-seal);
+  outline-offset: 3px;
+}
+
+.aj-btn:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 rgba(179, 38, 30, 0.85);
+}
+
+.aj-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.aj-btn-ghost {
+  background: transparent;
+  color: var(--aj-ink);
+  box-shadow: none;
+  border-color: var(--aj-ink-soft);
+}
+
+/* 惊堂木落槌：只在 landing → loading 出现一次 */
+.aj-gavel {
+  animation: aj-gavel-strike 900ms cubic-bezier(0.2, 1.4, 0.4, 1) 1 both;
+}
+
+@keyframes aj-gavel-strike {
+  0% {
+    transform: translateY(-42px) rotate(-18deg) scale(1.15);
+    opacity: 0;
+  }
+  55% {
+    transform: translateY(3px) rotate(2deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) rotate(0) scale(1);
+  }
+}
+
+.aj-court-text {
+  animation: aj-court-fade 1.6s ease both;
+}
+
+@keyframes aj-court-fade {
+  from {
+    opacity: 0;
+    letter-spacing: 0.8em;
+  }
+  to {
+    opacity: 1;
+    letter-spacing: 0.35em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aj-gavel,
+  .aj-court-text {
+    animation: none;
+  }
+}

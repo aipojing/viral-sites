@@ -8,6 +8,20 @@ const ALLOWED_EVENTS = new Set([
   'generate',
   'save_image',
   'export_error',
+  'fallback_used',
+  'rate_limited',
+  'budget_paused',
+  // 上班回本：属性只允许功能枚举与时长桶，禁止金额/时薪/作息/自定义文本
+  'setup_completed',
+  'scene_started',
+  'scene_finished',
+  'privacy_mode_used',
+  'daily_summary_viewed',
+  // 睡眠银行（life-grid 二期模块）：只记录是否打开/生成/调整，不携带任何作息数值
+  'time_ledger_opened',
+  'time_ledger_generated',
+  'habit_adjusted',
+  'return_visit',
   'share',
   'copy',
   'copy_link',
@@ -17,6 +31,9 @@ const ALLOWED_EVENTS = new Set([
   'tone_selected',
   'custom_scene_opened',
   'custom_scene_submitted',
+  // 道歉与请假（refusal-generator 文书模式）：只记录枚举，不携带称呼/事由/正文
+  'mode_selected',
+  'edited_before_copy',
   'challenge_opened',
   'challenge_completed',
   'link_invalid',
@@ -116,8 +133,14 @@ function writeProductEvent(env: PortalEnv, payload: ProductEventPayload): void {
       stringDimension(data, 'level'),
       stringDimension(data, 'scene'),
       stringDimension(data, 'tone'),
+      // 道歉与请假：文书类型 / 对象 / 内容档（usable|joke）枚举
+      stringDimension(data, 'type'),
+      stringDimension(data, 'audience'),
+      stringDimension(data, 'kind'),
       stringDimension(data, 'card'),
       stringDimension(data, 'id'),
+      // 上班回本：scene_finished 的时长桶，只允许枚举值
+      stringDimension(data, 'duration_bucket'),
     ],
     doubles: [
       1,

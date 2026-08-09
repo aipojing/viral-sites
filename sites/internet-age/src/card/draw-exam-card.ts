@@ -2,7 +2,6 @@ import { wrapByLength, type DrawFn, type TagsResult, type TestConfig } from '@vi
 
 const PINK = '#FF3E9D'
 const INK = '#333333'
-const GREY = '#888888'
 const TRACK = '#F0F0F0'
 const WHITE = '#ffffff'
 const BRAND_TEXT = '网感年龄测试 · viral-sites'
@@ -14,6 +13,32 @@ const RAINBOW: Array<[number, string]> = [
   [0.7, '#00C48C'],
   [1, '#00AEEF'],
 ]
+
+function fillRoundedRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number,
+  color: string,
+): void {
+  if (width <= 0 || height <= 0) return
+  const r = Math.min(radius, width / 2, height / 2)
+  ctx.fillStyle = color
+  ctx.beginPath()
+  ctx.moveTo(x + r, y)
+  ctx.lineTo(x + width - r, y)
+  ctx.quadraticCurveTo(x + width, y, x + width, y + r)
+  ctx.lineTo(x + width, y + height - r)
+  ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height)
+  ctx.lineTo(x + r, y + height)
+  ctx.quadraticCurveTo(x, y + height, x, y + height - r)
+  ctx.lineTo(x, y + r)
+  ctx.quadraticCurveTo(x, y, x + r, y)
+  ctx.closePath()
+  ctx.fill()
+}
 
 export function makeExamCardDraw(config: TestConfig, result: TagsResult): DrawFn {
   return (ctx, size) => {
@@ -33,19 +58,16 @@ export function makeExamCardDraw(config: TestConfig, result: TagsResult): DrawFn
     ctx.textAlign = 'center'
     ctx.font = `900 60px ${FONT}`
     ctx.fillText('互联网网感统一测试卷', size.width / 2, 200)
-    ctx.fillStyle = GREY
-    ctx.font = `400 30px ${FONT}`
-    ctx.fillText('（满分 100 · 不设及格线 · 禁止代考）', size.width / 2, 252)
 
     ctx.fillStyle = INK
     ctx.font = `400 36px ${FONT}`
-    ctx.fillText('你的精神网龄', size.width / 2, 340)
+    ctx.fillText('你的精神网龄', size.width / 2, 300)
     ctx.fillStyle = PINK
     ctx.font = `900 220px ${FONT}`
-    ctx.fillText(`${result.mentalAge}`, size.width / 2, 560)
+    ctx.fillText(`${result.mentalAge}`, size.width / 2, 530)
     ctx.fillStyle = INK
     ctx.font = `900 44px ${FONT}`
-    ctx.fillText(`岁 · 本卷判定：${result.dominant.title}`, size.width / 2, 640)
+    ctx.fillText(result.dominant.title, size.width / 2, 620)
 
     ctx.textAlign = 'left'
     ctx.font = `900 34px ${FONT}`
@@ -57,10 +79,16 @@ export function makeExamCardDraw(config: TestConfig, result: TagsResult): DrawFn
       ctx.fillStyle = INK
       ctx.font = `400 30px ${FONT}`
       ctx.fillText(share.title, paper.x + 80, rowY + 26)
-      ctx.fillStyle = TRACK
-      ctx.fillRect(barX, rowY, barW, 34)
-      ctx.fillStyle = share.barColor
-      ctx.fillRect(barX, rowY, Math.round((barW * share.percent) / 100), 34)
+      fillRoundedRect(ctx, barX, rowY, barW, 34, 17, TRACK)
+      fillRoundedRect(
+        ctx,
+        barX,
+        rowY,
+        Math.round((barW * share.percent) / 100),
+        34,
+        17,
+        share.barColor,
+      )
       ctx.fillStyle = INK
       ctx.font = `900 30px ${FONT}`
       ctx.fillText(`${share.percent}%`, barX + barW + 20, rowY + 26)

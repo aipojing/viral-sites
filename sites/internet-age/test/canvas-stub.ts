@@ -6,6 +6,12 @@ export interface RecordingCtx {
   fillText: ReturnType<typeof vi.fn>
   clearRect: ReturnType<typeof vi.fn>
   createLinearGradient: ReturnType<typeof vi.fn>
+  beginPath: ReturnType<typeof vi.fn>
+  moveTo: ReturnType<typeof vi.fn>
+  lineTo: ReturnType<typeof vi.fn>
+  quadraticCurveTo: ReturnType<typeof vi.fn>
+  closePath: ReturnType<typeof vi.fn>
+  fill: ReturnType<typeof vi.fn>
   save: ReturnType<typeof vi.fn>
   restore: ReturnType<typeof vi.fn>
   translate: ReturnType<typeof vi.fn>
@@ -26,6 +32,12 @@ export function installCanvasStub(): RecordingCtx {
     fillText: vi.fn(),
     clearRect: vi.fn(),
     createLinearGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
+    beginPath: vi.fn(),
+    moveTo: vi.fn(),
+    lineTo: vi.fn(),
+    quadraticCurveTo: vi.fn(),
+    closePath: vi.fn(),
+    fill: vi.fn(),
     save: vi.fn(),
     restore: vi.fn(),
     translate: vi.fn(),

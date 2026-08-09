@@ -43,6 +43,19 @@ describe('ResultScreen', () => {
     expect(onRestart).toHaveBeenCalled()
   })
 
+  it('第一张卡保存入口在时间账本模块入口之前', () => {
+    render(
+      <ResultScreen input={INPUT} onRestart={() => {}}>
+        <button>保存我的人生卡片</button>
+      </ResultScreen>,
+    )
+    const firstCard = screen.getByRole('button', { name: '保存我的人生卡片' })
+    const ledgerEntry = screen.getByRole('button', { name: '再看看，你的时间都去哪了' })
+    expect(
+      firstCard.compareDocumentPosition(ledgerEntry) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+  })
+
   it('关键百分比在格子图之前，首屏先给结论', () => {
     render(<ResultScreen input={INPUT} onRestart={() => {}} />)
     const summary = screen.getByTestId('life-summary')

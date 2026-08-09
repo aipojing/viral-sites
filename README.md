@@ -17,7 +17,7 @@
 | 01 | [人生进度条](docs/01-life-grid.md) | 输入生日，看你的人生还剩多少个格子 | 纯前端 | 🚀 [已上线](https://life-grid-7on.pages.dev)（统计已接入，真机四环境验收待办） |
 | 02 | [精神状态检测](docs/02-mental-state-check.md) | 8 道题测出你的班味浓度（系列化模板） | 纯前端 | 📐 设计完成，第二发 |
 | 03 | [AI 赛博判官](docs/03-ai-judge.md) | 报上名来，AI 给你写一张毒舌判词 | 轻后端 + LLM | 📐 设计完成，第三发 |
-| 04 | [上班回本计算器](docs/04-salary-timer.md) | 实时跳动：这次带薪如厕价值 ¥3.2 | 纯前端 | 💤 备选池 |
+| 04 | [上班回本计算器](docs/04-salary-timer.md) | 实时跳动：这次带薪如厕价值 ¥3.2 | 纯前端 | 📐 设计完成，待触发 |
 
 ### 候选池（已出设计文档，未排期）
 
@@ -30,7 +30,7 @@
 | 10 | [放假倒计时](docs/10-holiday-countdown.md) | A | 距下个假期 X 天 + 调休真相 + 请假攻略 |
 | 11 | [拒绝话术生成器](docs/11-refusal-generator.md) | A | 选场景选语气，一键复制拒绝话术 |
 | 12 | [网感年龄测试](docs/12-internet-age-test.md) | A | 测你的互联网精神年龄与成分（02 引擎换皮） |
-| 13~19 | [睡眠银行](docs/13-sleep-bank.md) · [道歉信](docs/14-apology-generator.md) · [按住不放](docs/15-hold-button.md) · [一秒钟世界](docs/16-one-second-world.md) · [亲戚称呼](docs/17-kinship-calculator.md) · [年度报告](docs/18-year-report.md) · [MBTI 日历](docs/19-mbti-calendar.md) | B | 简版设计，各自标注触发条件（节令/依赖/练手） |
+| 13~19 | [睡眠银行](docs/13-sleep-bank.md) · [道歉信](docs/14-apology-generator.md) · [按住不放](docs/15-hold-button.md) · [一秒钟世界](docs/16-one-second-world.md) · [亲戚称呼](docs/17-kinship-calculator.md) · [年度报告](docs/18-year-report.md) · [MBTI 日历](docs/19-mbti-calendar.md) | B | 产品设计完成，各自保留触发条件（节令/依赖/练手）。睡眠银行（01 结果页「时间都去哪了」模块）代码已完成并随主站构建，默认入口保留与否待上线后观测 gate（打开率 ≥20%、完成率 ≥60%、第一张卡保存率降幅 ≤2pp） |
 
 评级理由与淘汰区见 [docs/05-idea-pool.md](docs/05-idea-pool.md)；各站视觉风格分配（每站一种风格、一处签名元素）见 [docs/00a-style-map.md](docs/00a-style-map.md)。
 

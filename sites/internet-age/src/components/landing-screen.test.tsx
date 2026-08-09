@@ -10,6 +10,7 @@ describe('LandingScreen', () => {
     expect(screen.getByRole('heading', { name: '网感年龄测试' })).toBeInTheDocument()
     expect(screen.getByText('互联网网感统一测试卷')).toBeInTheDocument()
     expect(screen.getByText(/你的精神网龄，可能比身份证大 20 岁/)).toBeInTheDocument()
+    expect(screen.queryByText(/满分 100/)).not.toBeInTheDocument()
   })
 
   it('火星文点缀存在且对读屏隐藏', () => {

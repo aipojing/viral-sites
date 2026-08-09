@@ -1,4 +1,5 @@
 import type { PortalEnv } from './env'
+import { handleAiJudgeApi } from '../../ai-judge/worker/router'
 import { handleNextQuestionApi } from '../../next-question/worker/api'
 import { collectProductEvent } from './analytics'
 import { serveNextQuestionShell } from './next-question-shell'
@@ -18,7 +19,8 @@ export default {
       case 'analytics':
         return collectProductEvent(request, env)
       case 'ai-judge':
-        return featureUnavailable('ai-judge')
+        // AI 判官 handler 的所有绑定都是可选的：未配置生产资源时自动走开发态降级
+        return handleAiJudgeApi(request, env, ctx)
       case 'hold-button':
         return featureUnavailable('hold-button')
       case 'next-question-api':

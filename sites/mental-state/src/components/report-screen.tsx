@@ -8,14 +8,11 @@ interface Props {
   children?: ReactNode
 }
 
-export function ReportScreen({ config, result, onRestart, children }: Props) {
+export function ReportScreen({ result, onRestart, children }: Props) {
   return (
     <section className="pop-in flex flex-col gap-5">
       <header className="nb-card relative p-5">
         <p className="text-sm font-black tracking-[0.2em]">精神状态检测报告</p>
-        <p className="mt-1 text-xs">
-          检测项目：{config.meta.title} · 样本编号：BW-{String(result.score).padStart(2, '0')}
-        </p>
         <span className="stamp absolute -right-2 -top-4 text-xs">检测完毕</span>
       </header>
       <div className="nb-card p-6 text-center">

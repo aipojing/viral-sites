@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { computeStats, type LifeInput } from '../lib/life-math'
 import { buildCopyLines } from '../lib/copy-lines'
 import { LifeGridCanvas } from './life-grid-canvas'
+import { TimeLedgerSection } from './time-ledger-section'
 
 interface Props {
   input: LifeInput
@@ -60,6 +61,7 @@ export function ResultScreen({ input, onRestart, children }: Props) {
 
       <div className="flex flex-col gap-3">
         {children}
+        <TimeLedgerSection life={input} />
         <button type="button" onClick={onRestart} className="py-2 text-sm text-[#6d675b]">
           重新计算
         </button>

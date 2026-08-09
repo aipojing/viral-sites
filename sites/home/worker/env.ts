@@ -1,8 +1,12 @@
-import type { NextQuestionChain } from '../../next-question/worker/question-chain'
+import type { AiJudgeEnv } from '../../ai-judge/worker/env'
+import type { NextQuestionEnv } from '../../next-question/worker/env'
 
-export interface PortalEnv {
+interface BasePortalEnv {
   ASSETS: Fetcher
   PRODUCT_ANALYTICS: AnalyticsEngineDataset
-  NEXT_QUESTION_CHAINS: DurableObjectNamespace<NextQuestionChain>
-  NEXT_QUESTION_CREATE_LIMITER: RateLimit
 }
+
+// AI 判官的绑定与 secrets 都挂在同一个主站 Worker 上（AI_ 前缀）。
+// AiJudgeEnv 全部可选：未配置生产资源时 handler 走开发态降级。
+// 下一问的 Durable Object 与创建限流绑定同样挂在主站 Worker（NEXT_QUESTION_ 前缀）。
+export type PortalEnv = BasePortalEnv & AiJudgeEnv & NextQuestionEnv

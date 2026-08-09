@@ -78,6 +78,17 @@ export const projects: Project[] = [
     hero: '/assets/internet-age-hero-v2.jpg',
   },
   {
+    slug: 'ai-judge',
+    title: 'AI 赛博判官',
+    shortTitle: '赛博判官',
+    description: '报上名号与一句自白，AI 判官当庭宣判：罪名、判词、刑期，一样不少。',
+    href: '/ai-judge/',
+    preview: '/previews/ai-judge.avif',
+    flavor: 'AI 判词',
+    accent: '#b3261e',
+    hero: '/assets/ai-judge-hero-v1.jpg',
+  },
+  {
     slug: 'next-question',
     title: '下一问',
     shortTitle: '下一问',
@@ -87,6 +98,17 @@ export const projects: Project[] = [
     flavor: '六人接力',
     accent: '#e63b2e',
     hero: '/assets/next-question-hero-v1.jpg',
+  },
+  {
+    slug: 'salary-timer',
+    title: '上班回本计算器',
+    shortTitle: '上班回本',
+    description: '上班越久，回本越多。开会、发呆、排队都给你计价。小票不含月薪。',
+    href: '/salary-timer/',
+    preview: '/previews/salary-timer.avif',
+    flavor: '小票计价',
+    accent: '#b8422c',
+    hero: '/assets/salary-timer-hero-v1.jpg',
   },
 ]
 

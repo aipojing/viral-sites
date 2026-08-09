@@ -11,6 +11,7 @@ export {
   normalizeAddressee,
   renderTemplate,
 } from './phrase/template'
+export { listTemplateVariables, renderOptionalTemplate, type TemplateValues } from './phrase/interpolate'
 export { phraseLibrarySchema, phraseSchema, type Phrase } from './phrase/schema'
 export { lintPhraseLibrary, type PhraseLintConfig, type PhraseLintIssue } from './phrase/lint'
 export { fnv1a } from './seeded/fnv1a'

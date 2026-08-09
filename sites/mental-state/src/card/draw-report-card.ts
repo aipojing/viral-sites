@@ -29,7 +29,7 @@ function drawStamp(
   ctx.restore()
 }
 
-export function makeReportCardDraw(config: TestConfig, result: QuizResult): DrawFn {
+export function makeReportCardDraw(_config: TestConfig, result: QuizResult): DrawFn {
   return (ctx, size) => {
     ctx.fillStyle = YELLOW
     ctx.fillRect(0, 0, size.width, size.height)
@@ -47,19 +47,13 @@ export function makeReportCardDraw(config: TestConfig, result: QuizResult): Draw
     ctx.textAlign = 'center'
     ctx.font = `900 72px ${FONT}`
     ctx.fillText('精神状态检测报告', size.width / 2, card.y + 130)
-    ctx.font = `400 32px ${FONT}`
-    ctx.fillText(
-      `检测项目：${config.meta.title} · 样本编号：BW-${String(result.score).padStart(2, '0')}`,
-      size.width / 2,
-      card.y + 190,
-    )
 
     ctx.font = `900 210px ${FONT}`
-    ctx.fillText(`${result.percent}%`, size.width / 2, card.y + 420)
+    ctx.fillText(`${result.percent}%`, size.width / 2, card.y + 390)
 
     const badge = { w: 600, h: 96 }
     const badgeX = (size.width - badge.w) / 2
-    const badgeY = card.y + 470
+    const badgeY = card.y + 440
     ctx.fillStyle = YELLOW
     ctx.fillRect(badgeX, badgeY, badge.w, badge.h)
     ctx.lineWidth = 6

@@ -9,14 +9,14 @@ const ctx = {
 } as unknown as ExecutionContext
 
 describe('ai-judge router', () => {
-  it('POST /api/ai-judge/verdict 进入业务占位', async () => {
+  it('POST /api/ai-judge/verdict 进入业务编排（空 body 返回 400）', async () => {
     const response = await handleAiJudgeApi(
       new Request('https://example.com/api/ai-judge/verdict', { method: 'POST' }),
       env,
       ctx,
     )
-    expect(response.status).toBe(501)
-    expect(await response.json()).toEqual({ code: 'not_implemented' })
+    expect(response.status).toBe(400)
+    expect(await response.json()).toEqual({ code: 'invalid_body' })
   })
 
   it('verdict 上的非 POST 方法返回 405', async () => {

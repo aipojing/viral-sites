@@ -7,3 +7,8 @@ dist/
 !.env.example
 coverage/
 .turbo/
+.wrangler/
+.qwen/
+.playwright-cli/
+artifacts/
+output/

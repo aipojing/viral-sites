@@ -7,7 +7,9 @@ export type ExperienceSlug =
   | 'cyber-fortune'
   | 'refusal-generator'
   | 'internet-age'
+  | 'ai-judge'
   | 'next-question'
+  | 'salary-timer'
 
 export type ExperienceLoader = () => Promise<ComponentType>
 
@@ -55,10 +57,24 @@ export const experienceLoaders: Readonly<Record<ExperienceSlug, ExperienceLoader
     ])
     return module.App
   },
+  'ai-judge': async () => {
+    const [module] = await Promise.all([
+      import('../../ai-judge/src/app'),
+      import('../../ai-judge/src/index.css'),
+    ])
+    return module.App
+  },
   'next-question': async () => {
     const [module] = await Promise.all([
       import('../../next-question/src/app'),
       import('../../next-question/src/index.css'),
+    ])
+    return module.App
+  },
+  'salary-timer': async () => {
+    const [module] = await Promise.all([
+      import('../../salary-timer/src/app'),
+      import('../../salary-timer/src/index.css'),
     ])
     return module.App
   },

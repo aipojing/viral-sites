@@ -90,4 +90,31 @@ describe('App', () => {
     expect(analyticsSpy).toHaveBeenCalledWith('custom_scene_submitted', { mode: 'local' })
     expect(JSON.stringify(analyticsSpy.mock.calls)).not.toContain('同事让我替他背锅')
   })
+
+  it('顶层双 tab：默认拒绝话术按下，切换上报 mode_selected', async () => {
+    render(<App />)
+    const refusalTab = screen.getByRole('button', { name: '拒绝话术' })
+    const documentTab = screen.getByRole('button', { name: '道歉与请假' })
+    expect(refusalTab).toHaveAttribute('aria-pressed', 'true')
+    expect(documentTab).toHaveAttribute('aria-pressed', 'false')
+
+    await userEvent.click(documentTab)
+    expect(analyticsSpy).toHaveBeenCalledWith('mode_selected', { mode: 'document' })
+    expect(documentTab).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.queryByRole('button', { name: /被借钱/ })).not.toBeInTheDocument()
+  })
+
+  it('切到文书再切回：拒绝模式完全重置，不残留场景与话术', async () => {
+    render(<App />)
+    await userEvent.click(screen.getByRole('button', { name: /被借钱/ }))
+    await userEvent.click(screen.getByRole('button', { name: '直球硬刚' }))
+    expect(screen.getByText('不借。我的钱也是一分一分挣的。')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: '道歉与请假' }))
+    await userEvent.click(screen.getByRole('button', { name: '拒绝话术' }))
+
+    expect(screen.getByRole('button', { name: /被借钱/ })).toHaveAttribute('aria-pressed', 'false')
+    expect(screen.queryByRole('button', { name: '直球硬刚' })).not.toBeInTheDocument()
+    expect(screen.queryByText('不借。我的钱也是一分一分挣的。')).not.toBeInTheDocument()
+  })
 })

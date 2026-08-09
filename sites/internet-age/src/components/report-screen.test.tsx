@@ -12,7 +12,10 @@ describe('ReportScreen', () => {
     render(<ReportScreen config={wangGanConfig} result={result} onRestart={() => {}} />)
     expect(screen.getByText('34')).toBeInTheDocument()
     expect(screen.getByText('你的精神网龄')).toBeInTheDocument()
-    expect(screen.getByText('本卷判定：QQ空间贵族')).toBeInTheDocument()
+    expect(screen.getAllByText('QQ空间贵族')).toHaveLength(2)
+    expect(screen.queryByText('岁')).not.toBeInTheDocument()
+    expect(screen.queryByText(/本卷判定/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/座位号/)).not.toBeInTheDocument()
   })
 
   it('成分条形图与锐评齐全', () => {
