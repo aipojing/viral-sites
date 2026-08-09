@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b0a1f" />
+    <title>年度报告（本地调试）</title>
+    <meta name="description" content="本地调试入口。生产页面由怪好玩主站 /year-report/ 提供。" />
+    <script>
+      // 必须在任何脚本（含统计）之前跑：把分享 fragment 从地址栏摘下来，
+      // 避免带答案的 hash 被后续脚本或页面地址采集读到。
+      window.__YEAR_REPORT_FRAGMENT__ = window.location.hash
+      if (window.location.hash) {
+        history.replaceState(null, '', window.location.pathname + window.location.search)
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
