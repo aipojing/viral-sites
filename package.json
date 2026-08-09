@@ -1,5 +1,6 @@
 {
   "name": "viral-sites",
+  "description": "小站工厂：批量生产「功能极简、好玩、易传播」的中文小网站，用数据验证哪个点子有传播力。",
   "private": true,
   "scripts": {
     "test": "pnpm -r test",

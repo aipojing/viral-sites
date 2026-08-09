@@ -12,44 +12,74 @@
 
 生产主站：[guaihaowan.xueban-ai.workers.dev](https://guaihaowan.xueban-ai.workers.dev)
 
-## 站点路线图
+## 已上线站点
 
-| # | 站点 | 一句话 | 形态 | 状态 |
-|---|------|--------|------|------|
-| 01 | [人生进度条](docs/01-life-grid.md) | 输入生日，看你的人生还剩多少个格子 | 纯前端 | 🚀 [统一主站已上线](https://guaihaowan.xueban-ai.workers.dev/life-grid/) |
-| 02 | [精神状态检测](docs/02-mental-state-check.md) | 8 道题测出你的班味浓度（系列化模板） | 纯前端 | 🚀 [统一主站已上线](https://guaihaowan.xueban-ai.workers.dev/mental-state/) |
-| 03 | [AI 赛博判官](docs/03-ai-judge.md) | 报上名来，AI 给你写一张毒舌判词 | 轻后端 + LLM | 🚀 [统一主站已上线](https://guaihaowan.xueban-ai.workers.dev/ai-judge/)（未配置模型时使用安全兜底判词） |
-| 04 | [上班回本计算器](docs/04-salary-timer.md) | 实时跳动：这次带薪如厕价值 ¥3.2 | 纯前端 | 🚀 [统一主站已上线](https://guaihaowan.xueban-ai.workers.dev/salary-timer/) |
+| # | 站点 | 一句话 | 形态 |
+|---|------|--------|------|
+| 01 | [人生进度条](docs/01-life-grid.md) | 输入生日，看你的人生还剩多少个格子 | 纯前端 |
+| 02 | [精神状态检测](docs/02-mental-state-check.md) | 8 道题测出你的班味浓度 | 纯前端 |
+| 03 | [AI 赛博判官](docs/03-ai-judge.md) | 报上名来，AI 给你写一张毒舌判词 | 轻后端 + LLM |
+| 04 | [上班回本计算器](docs/04-salary-timer.md) | 实时跳动：这次带薪如厕价值 ¥3.2 | 纯前端 |
+| 06 | [默契度测试](docs/06-tacit-test.md) | 答 10 题生成链接发对方，链接被打开结果才存在 | 纯前端 |
+| 08 | [赛博求签](docs/08-cyber-fortune.md) | 打工人电子黄历，每日一签 | 纯前端 |
+| 11 | [拒绝话术生成器](docs/11-refusal-generator.md) | 选场景选语气，一键复制拒绝话术 | 纯前端/轻 AI |
+| 12 | [网感年龄测试](docs/12-internet-age-test.md) | 测你的互联网精神年龄与成分 | 纯前端 |
+| 15 | [按住不放挑战](docs/15-hold-button.md) | 按住按钮别松手，看你能坚持多久 | 纯前端/轻后端 |
+| 16 | [一秒钟世界](docs/16-one-second-world.md) | 你盯着屏幕的这几秒，世界在发生什么 | 纯前端 |
+| 17 | [亲戚称呼计算器](docs/17-kinship-calculator.md) | 点出关系链，算出该怎么称呼 | 纯前端 |
+| 18 | [年度报告](docs/18-year-report.md) | 十个问题，生成你的年度总结 | 纯前端 |
+| 20 | [下一问](docs/20-next-question.md) | 六人接力问答，问题最后回到起点 | 轻后端 |
 
-### 候选池（已出设计文档，未排期）
+全部 13 个站点通过统一主站同源部署，路径分别为 `/life-grid/`、`/mental-state/`、`/ai-judge/` 等。
+
+## 候选池（已出设计文档，未上线）
 
 | # | 站点 | 评级 | 一句话 |
 |---|------|------|--------|
-| 06 | [默契度测试](docs/06-tacit-test.md) | S | 答 10 题生成链接发对方，链接被打开结果才存在——自带传播闭环 |
 | 07 | [余生清单](docs/07-bucket-list.md) | S | 勾选热爱的事，算出「还能吃 812 次火锅」清单卡 |
-| 08 | [赛博求签](docs/08-cyber-fortune.md) | S | 打工人电子黄历，每日一签，复访最强 |
 | 09 | [花光首富的钱](docs/09-spend-fortune.md) | A | 给你 3000 亿看你几分钟花完，购物清单卡 |
 | 10 | [放假倒计时](docs/10-holiday-countdown.md) | A | 距下个假期 X 天 + 调休真相 + 请假攻略 |
-| 11 | [拒绝话术生成器](docs/11-refusal-generator.md) | A | 选场景选语气，一键复制拒绝话术 |
-| 12 | [网感年龄测试](docs/12-internet-age-test.md) | A | 测你的互联网精神年龄与成分（02 引擎换皮） |
-| 13~19 | [睡眠银行](docs/13-sleep-bank.md) · [道歉信](docs/14-apology-generator.md) · [按住不放](docs/15-hold-button.md) · [一秒钟世界](docs/16-one-second-world.md) · [亲戚称呼](docs/17-kinship-calculator.md) · [年度报告](docs/18-year-report.md) · [MBTI 日历](docs/19-mbti-calendar.md) | B | 产品设计完成，各自保留触发条件（节令/依赖/练手）。睡眠银行（01 结果页「时间都去哪了」模块）代码已完成并随主站构建，默认入口保留与否待上线后观测 gate（打开率 ≥20%、完成率 ≥60%、第一张卡保存率降幅 ≤2pp） |
+| 19 | [MBTI 受难日历](docs/19-mbti-calendar.md) | B | 每天一条「INFP 今日受难事项」 |
 
-评级理由与淘汰区见 [docs/05-idea-pool.md](docs/05-idea-pool.md)；各站视觉风格分配（每站一种风格、一处签名元素）见 [docs/00a-style-map.md](docs/00a-style-map.md)。
+> 睡眠银行、道歉信生成器已分别作为人生进度条结果页模块和拒绝话术生成器模式并入上线站点，不再独立成站。
 
-## 技术栈（规划）
+评级理由与淘汰区见 [docs/05-idea-pool.md](docs/05-idea-pool.md)；各站视觉风格分配见 [docs/00a-style-map.md](docs/00a-style-map.md)。
 
-- pnpm monorepo：`packages/shared`（卡片生成 / 埋点 / 基础 UI） + `sites/*`（每个玩法源码独立）+ `sites/home`（唯一生产主站）
-- Vite + React + TypeScript + Tailwind
-- 部署：统一主站单一部署——`sites/home` 一个 Vite MPA 产物 + 一个 Cloudflare Worker（Static Assets）；玩法走同源路径 `/ai-judge/`、`/salary-timer/` 等，不再单独建 Pages/Workers 项目；历史 `life-grid` Pages 项目已删除
+## 技术栈
+
+- pnpm monorepo：`packages/shared`（卡片生成 / 埋点 / 基础 UI） + `sites/*`（每个玩法源码）+ `sites/home`（唯一生产主站）
+- Vite + React + TypeScript + Tailwind CSS v4
+- 部署：统一主站单一部署——`sites/home` 一个 Vite MPA 产物 + 一个 Cloudflare Worker（Static Assets）；玩法走同源路径，不再单独建 Pages/Workers 项目
 - 统计：Cloudflare Analytics Engine（访问 / 生成 / 保存卡片等第一方事件），主站同源接收 `/api/events`
+- 测试：Vitest（含 Worker 环境测试）
+
+## 本地开发
+
+```bash
+# 安装依赖
+pnpm install
+
+# 本地启动主站
+pnpm --filter @viral/home dev
+
+# 类型检查
+pnpm typecheck
+
+# 跑测试
+pnpm test
+
+# 构建全部
+pnpm build
+```
 
 ## 仓库结构
 
 ```
 viral-sites/
-  docs/            # 设计文档（当前阶段的全部产出）
+  docs/            # 设计文档
   packages/        # 共享能力包
   sites/           # 各玩法源码与唯一生产主站
+  output/          # 截图、报告等产物
 ```
 
-当前阶段：**统一主站已上线**，一次部署提供首页、9 个玩法、第一方产品统计和需要后端的玩法 API。
+当前阶段：**统一主站持续迭代中**，13 个玩法同源部署，通过第一方数据持续验证传播力。
