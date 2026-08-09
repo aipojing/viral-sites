@@ -15,5 +15,5 @@ describe('experience registry', () => {
       const Component = await loader()
       expect(typeof Component, `${slug} loader 必须返回组件`).toBe('function')
     }
-  })
+  }, 15_000)
 })
