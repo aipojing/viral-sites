@@ -1,0 +1,16 @@
+interface LongPressOverlayProps {
+  dataUrl: string
+  alt: string
+  onClose: () => void
+}
+
+/** 微信等无法触发下载的浏览器：展示图片让用户长按保存 */
+export function LongPressOverlay({ dataUrl, alt, onClose }: LongPressOverlayProps) {
+  return (
+    <div className="kcc-overlay" onClick={onClose}>
+      <img src={dataUrl} alt={alt} className="kcc-overlay__image" />
+      <p className="kcc-overlay__hint">长按图片保存</p>
+      <p className="kcc-overlay__close-hint">点击空白处关闭</p>
+    </div>
+  )
+}
