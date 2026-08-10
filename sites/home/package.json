@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm gen:relation-pages && vite",
-    "gen:relation-pages": "pnpm --filter @viral/kinship-calculator exec tsx scripts/generate-relation-pages.ts --out ../home/public/kinship-calculator/relations --origin https://guaihaowan.xueban-ai.workers.dev",
+    "gen:relation-pages": "pnpm --filter @viral/kinship-calculator exec tsx scripts/generate-relation-pages.ts --out ../home/public/kinship-calculator/relations --origin https://guaihaowan.aipojing.xyz",
     "build": "tsc --noEmit && tsc --noEmit -p worker && vitest run && vitest run --config vitest.worker.config.ts && pnpm gen:relation-pages && vite build && node scripts/verify-integrated-build.mjs",
     "test": "vitest run && vitest run --config vitest.worker.config.ts",
     "test:worker": "vitest run --config vitest.worker.config.ts",

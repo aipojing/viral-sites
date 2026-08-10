@@ -10,7 +10,7 @@
 
 详见 [docs/00-factory-design.md](docs/00-factory-design.md)。
 
-生产主站：[guaihaowan.xueban-ai.workers.dev](https://guaihaowan.xueban-ai.workers.dev)
+生产主站：[guaihaowan.aipojing.xyz](https://guaihaowan.aipojing.xyz)
 
 ## 已上线站点
 
