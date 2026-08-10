@@ -4,6 +4,8 @@
   "main": "worker/index.ts",
   // 对齐当前 Wrangler 内置 workerd 支持的最新日期，保证默认 wrangler dev 可启动。
   "compatibility_date": "2026-08-08",
+  "workers_dev": true,
+  "preview_urls": false,
   "routes": [
     { "pattern": "guaihaowan.aipojing.xyz", "custom_domain": true }
   ],
