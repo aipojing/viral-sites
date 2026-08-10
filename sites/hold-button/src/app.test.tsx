@@ -110,7 +110,8 @@ describe('按住不放 App', () => {
     expect(screen.getByText(/正在核对/)).toBeInTheDocument()
 
     await waitFor(() => expect(screen.getByText(/超过今天 40%/)).toBeInTheDocument())
-    expect(screen.getByText(/12 人/)).toBeInTheDocument()
+    // session 的 todayCount 是开局前人数；可信提交成功后应计入本人。
+    expect(screen.getByText(/13 人/)).toBeInTheDocument()
     // 本地时长未被服务端覆盖
     expect(screen.getByText('20.4 秒')).toBeInTheDocument()
     expect(fetchMock).toHaveBeenCalledTimes(2)

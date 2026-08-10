@@ -43,12 +43,13 @@ export function ResultScreen({
   onDelete,
 }: {
   chain: PublicChain
-  onDelete?(): Promise<void>
+  onDelete?(): Promise<string | null>
 }) {
   const publicUrl = buildPublicChainUrl(window.location.origin, chain.slug)
   const [shared, setShared] = useState(false)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
   const startDate = new Date(chain.createdAt).toLocaleDateString('zh-CN', {
     year: 'numeric',
     month: '2-digit',
@@ -68,6 +69,17 @@ export function ResultScreen({
     })
     setShared(true)
     track('share', { mode: method })
+  }
+
+  async function handleDelete() {
+    if (deleting || !onDelete) return
+    setDeleting(true)
+    setDeleteError(null)
+    const code = await onDelete()
+    if (code) {
+      setDeleteError('删除没有成功，请重试')
+      setDeleting(false)
+    }
   }
 
   return (
@@ -122,13 +134,15 @@ export function ResultScreen({
           {confirmingDelete ? (
             <div className="flex flex-col gap-3 rounded-xl border border-[#c8392b]/40 bg-[#c8392b]/5 px-4 py-3">
               <p className="text-sm text-stone-700">删除后整条链的问答都会清空，且无法恢复。确定吗？</p>
+              {deleteError ? (
+                <p className="text-sm text-[#c8392b]" role="alert">
+                  {deleteError}
+                </p>
+              ) : null}
               <div className="flex gap-3">
                 <button
                   type="button"
-                  onClick={() => {
-                    setDeleting(true)
-                    void onDelete()
-                  }}
+                  onClick={() => void handleDelete()}
                   disabled={deleting}
                   className="min-h-11 rounded-full bg-[#c8392b] px-5 text-sm font-semibold text-white disabled:opacity-50"
                 >

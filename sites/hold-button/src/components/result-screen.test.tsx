@@ -6,6 +6,7 @@ import { ResultScreen } from './result-screen'
 const base = {
   durationMs: 23_400,
   percentile: null as number | null,
+  percentilePending: false,
   localOnly: false,
   todayCount: 0,
   isNewBest: false,
@@ -30,6 +31,17 @@ describe('ResultScreen', () => {
   it('本地模式展示降级文案，不展示百分位', () => {
     render(<ResultScreen {...base} localOnly />)
     expect(screen.getByText(/成绩保留在本机/)).toBeInTheDocument()
+  })
+
+  it('服务端已返回首位结果 percentile=null 时不再显示正在核对', () => {
+    render(<ResultScreen {...base} todayCount={1} />)
+    expect(screen.getByText(/首位完成挑战/)).toBeInTheDocument()
+    expect(screen.queryByText(/正在核对/)).not.toBeInTheDocument()
+  })
+
+  it('只在等待服务端结果时显示正在核对', () => {
+    render(<ResultScreen {...base} percentilePending />)
+    expect(screen.getByText(/正在核对/)).toBeInTheDocument()
   })
 
   it('打破本机纪录时给出提示', () => {

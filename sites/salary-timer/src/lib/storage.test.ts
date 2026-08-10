@@ -115,6 +115,34 @@ describe('loadSalaryData / saveSalaryData', () => {
     expect(loadSalaryData(local, new FakeStorage())).toBeNull()
   })
 
+  it('嵌套的设置、片段和日期缓存字段非法时视为不存在', () => {
+    const local = new FakeStorage()
+    const session = new FakeStorage()
+    const invalidRecords: unknown[] = [
+      data({ settings: { ...settings(), workdays: ['weekday'] } as unknown as SalarySettings }),
+      data({
+        fragments: [
+          { ...fragment(new Date(2026, 7, 10, 11).getTime()), paidIntervalsAtStart: [{ startMs: 'bad', endMs: 2 }] },
+        ] as unknown as readonly FragmentResult[],
+      }),
+      data({ activeDates: [123] as unknown as readonly string[] }),
+      data({ reportedReturnDays: [1, '7'] as unknown as readonly number[] }),
+    ]
+
+    for (const invalid of invalidRecords) {
+      local.setItem(STORAGE_KEY, JSON.stringify(invalid))
+      expect(loadSalaryData(local, session)).toBeNull()
+    }
+
+    const historical = data({
+      fragments: [fragment(new Date(2026, 7, 10, 11).getTime())],
+      activeDates: ['2026-08-03', '2026-08-10'],
+      reportedReturnDays: [1, 7],
+    })
+    local.setItem(STORAGE_KEY, JSON.stringify(historical))
+    expect(loadSalaryData(local, session)).toEqual(historical)
+  })
+
   it('存储写入异常返回 false 而不是抛出', () => {
     const local = new FakeStorage()
     local.throwOnSet = true

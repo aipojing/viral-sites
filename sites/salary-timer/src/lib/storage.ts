@@ -1,5 +1,5 @@
 import type { FragmentResult } from './fragment'
-import type { SalarySettings } from './settings'
+import { validateSettings, type SalarySettings } from './settings'
 import { daysBetween, localDateKey } from './time-local'
 
 export interface SalaryLocalData {
@@ -16,17 +16,70 @@ export const STORAGE_KEY = 'viral:salary-timer:data:v1'
 // 片段记录最多保留 31 个自然日。
 const MAX_RETENTION_DAYS = 31
 
+const DATE_KEY_PATTERN = /^\d{4}-\d{2}-\d{2}$/
+const SCENES = new Set(['meeting', 'toilet', 'idle', 'queue', 'custom'])
+
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value)
+}
+
+function isDateKey(value: unknown): value is string {
+  return typeof value === 'string' && DATE_KEY_PATTERN.test(value)
+}
+
+function isValidFragment(raw: unknown): raw is FragmentResult {
+  if (typeof raw !== 'object' || raw === null) return false
+  const fragment = raw as Record<string, unknown>
+  if (
+    typeof fragment.id !== 'string' ||
+    !SCENES.has(fragment.scene as string) ||
+    (fragment.customLabel !== undefined && typeof fragment.customLabel !== 'string') ||
+    !isFiniteNumber(fragment.startedAtMs) ||
+    !isFiniteNumber(fragment.endedAtMs) ||
+    fragment.endedAtMs < fragment.startedAtMs ||
+    !isFiniteNumber(fragment.rateAtStart) ||
+    !isDateKey(fragment.settingsEffectiveFrom) ||
+    !isFiniteNumber(fragment.durationMs) ||
+    fragment.durationMs < 0 ||
+    !isFiniteNumber(fragment.paidDurationMs) ||
+    fragment.paidDurationMs < 0 ||
+    !isFiniteNumber(fragment.equivalent) ||
+    !Array.isArray(fragment.paidIntervalsAtStart)
+  ) {
+    return false
+  }
+  return fragment.paidIntervalsAtStart.every(
+    (interval) =>
+      typeof interval === 'object' &&
+      interval !== null &&
+      isFiniteNumber((interval as Record<string, unknown>).startMs) &&
+      isFiniteNumber((interval as Record<string, unknown>).endMs) &&
+      (interval as Record<string, number>).endMs >= (interval as Record<string, number>).startMs,
+  )
+}
+
+function isValidSettings(raw: unknown): raw is SalarySettings {
+  try {
+    validateSettings(raw)
+    return true
+  } catch {
+    return false
+  }
+}
+
 function isValidData(raw: unknown): raw is SalaryLocalData {
   if (typeof raw !== 'object' || raw === null) return false
   const record = raw as Record<string, unknown>
   return (
     record.version === 1 &&
-    typeof record.settings === 'object' &&
-    record.settings !== null &&
+    isValidSettings(record.settings) &&
     Array.isArray(record.fragments) &&
-    typeof record.firstVisitDate === 'string' &&
+    record.fragments.every(isValidFragment) &&
+    isDateKey(record.firstVisitDate) &&
     Array.isArray(record.activeDates) &&
-    Array.isArray(record.reportedReturnDays)
+    record.activeDates.every(isDateKey) &&
+    Array.isArray(record.reportedReturnDays) &&
+    record.reportedReturnDays.every((day) => day === 1 || day === 7)
   )
 }
 

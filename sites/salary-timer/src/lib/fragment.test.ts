@@ -115,6 +115,18 @@ describe('finishFragment', () => {
     expect(result.paidDurationMs).toBe(2 * HOUR)
   })
 
+  it('跨午夜班次：凌晨才开始的片段快照前一天班次区间', () => {
+    const night = settings({
+      shiftStart: '22:00',
+      shiftEnd: '06:00',
+      lunchStart: undefined,
+      lunchEnd: undefined,
+    })
+    const active = startFragment('meeting', new Date(2026, 7, 11, 2), night)
+    const result = finishFragment(active, new Date(2026, 7, 11, 3))
+    expect(result.paidDurationMs).toBe(HOUR)
+  })
+
   it('结束早于开始直接拒绝', () => {
     const active = startFragment('idle', new Date(2026, 7, 10, 10), settings())
     expect(() => finishFragment(active, new Date(2026, 7, 10, 9))).toThrow()

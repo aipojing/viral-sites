@@ -83,6 +83,60 @@ const ALLOWED_EVENTS = new Set([
 
 type EventData = Record<string, unknown>
 
+type DataRule = 'identifier' | 'bucket' | 'binary' | 'smallInteger' | 'relationToken' | 'reportQuestion'
+
+const RELATION_TOKENS = new Set([
+  'father', 'mother', 'husband', 'wife', 'older-brother', 'younger-brother', 'older-sister', 'younger-sister', 'son', 'daughter',
+])
+const REPORT_QUESTION_IDS = new Set([
+  'keyword', 'place', 'song', 'comfort-food', 'important-person', 'small-win', 'hard-moment', 'feeling-scale', 'goal-and-release', 'next-year-message',
+])
+
+/** 逐事件字段白名单：未知字段不落库；无合法属性的敏感事件携带 data 时直接拒绝。 */
+const EVENT_DATA_RULES: Record<string, Partial<Record<string, DataRule>>> = {
+  page_view: {},
+  generate: { slug: 'identifier', mode: 'identifier', scene: 'identifier', tone: 'identifier', kind: 'identifier', quiz: 'identifier', level: 'identifier', bucket: 'smallInteger', reason: 'identifier', device: 'identifier', score: 'smallInteger', age: 'smallInteger' },
+  save_image: { slug: 'identifier', card: 'identifier', scene: 'identifier', tone: 'identifier', type: 'identifier', field_count: 'smallInteger' },
+  export_error: { slug: 'identifier', card: 'identifier' }, fallback_used: { slug: 'identifier' }, rate_limited: { slug: 'identifier' }, budget_paused: { slug: 'identifier' },
+  setup_completed: { slug: 'identifier' }, scene_started: { slug: 'identifier', scene: 'identifier' }, scene_finished: { slug: 'identifier', scene: 'identifier', duration_bucket: 'bucket' }, privacy_mode_used: { slug: 'identifier', enabled: 'binary' }, daily_summary_viewed: { slug: 'identifier' },
+  time_ledger_opened: {}, time_ledger_generated: {}, habit_adjusted: {}, return_visit: { slug: 'identifier', day: 'smallInteger' }, share: { mode: 'identifier' }, copy: { mode: 'identifier', scene: 'identifier', tone: 'identifier', type: 'identifier', audience: 'identifier', kind: 'identifier' }, copy_link: {}, q_answered: { slug: 'identifier', q: 'smallInteger', mode: 'identifier' }, streak_day: { streak: 'smallInteger' },
+  scene_selected: { scene: 'identifier' }, tone_selected: { tone: 'identifier' }, custom_scene_opened: { mode: 'identifier' }, custom_scene_submitted: { mode: 'identifier' }, mode_selected: { mode: 'identifier' }, edited_before_copy: { type: 'identifier', tone: 'identifier' }, safety_mode: { mode: 'identifier' },
+  challenge_opened: { bucket: 'smallInteger' }, challenge_completed: { quiz: 'identifier', score: 'smallInteger' }, link_invalid: {}, challenge_create: {}, challenge_complete: {}, question_chain_create: {}, question_open: {}, question_submit: {}, question_chain_complete: {},
+  next_question_created: {}, next_question_baton_opened: { q: 'smallInteger' }, next_question_baton_submitted: { q: 'smallInteger' }, next_question_baton_shared: { q: 'smallInteger', mode: 'identifier' }, next_question_returned: {}, next_question_completed: {}, next_question_result_saved: {}, next_question_redacted: {},
+  challenge_started: { bucket: 'smallInteger', device: 'identifier' }, challenge_finished: { bucket: 'smallInteger', reason: 'identifier', device: 'identifier' }, challenge_shared: { channel: 'identifier' },
+  chapter_viewed: { chapter: 'identifier' }, source_opened: { source: 'identifier' }, engaged_time_bucket: { bucket: 'bucket' }, snapshot_generated: { duration_bucket: 'bucket' },
+  query_started: { mode: 'identifier' }, query_resolved: {}, query_unresolved: { reason: 'identifier' }, relation_step_added: { relation: 'relationToken' }, reverse_used: { method: 'identifier' }, region_pack_used: { region: 'identifier' }, correction_submitted: { method: 'identifier' },
+  report_started: { mode: 'identifier' }, question_completed: { question: 'reportQuestion', skipped: 'identifier' }, draft_resumed: {}, draft_cleared: {}, share_link_created: { version: 'smallInteger', field_count: 'smallInteger' }, share_report_opened: { version: 'smallInteger', field_count: 'smallInteger' },
+}
+
+function dataValueMatches(value: unknown, rule: DataRule): boolean {
+  if (rule === 'identifier') return typeof value === 'string' && /^[A-Za-z0-9_-]{1,80}$/.test(value)
+  if (rule === 'bucket') return typeof value === 'string' && /^[A-Za-z0-9_-]{1,32}$/.test(value)
+  if (rule === 'binary') return value === 0 || value === 1
+  if (rule === 'relationToken') return typeof value === 'string' && RELATION_TOKENS.has(value)
+  if (rule === 'reportQuestion') return typeof value === 'string' && REPORT_QUESTION_IDS.has(value)
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= 10_000
+}
+
+function normalizeEventData(event: string, value: unknown): EventData | null {
+  if (!value) return {}
+  if (typeof value !== 'object' || Array.isArray(value)) return null
+  const rules = EVENT_DATA_RULES[event]
+  const data = value as EventData
+  const normalized: EventData = {}
+  for (const [key, fieldValue] of Object.entries(data)) {
+    const rule = rules[key]
+    if (!rule) {
+      // query_resolved 没有任何合法属性：携带内容意味着可能在尝试上报关系答案，直接拒绝。
+      if (event === 'query_resolved') return null
+      continue
+    }
+    if (!dataValueMatches(fieldValue, rule)) return null
+    normalized[key] = fieldValue
+  }
+  return normalized
+}
+
 interface ProductEventPayload {
   event: string
   data: EventData
@@ -124,9 +178,8 @@ function normalizePayload(value: unknown): ProductEventPayload | null {
   const path = normalizePath(input.path)
   const sessionId = normalizeSessionId(input.sessionId)
   if (!path || !sessionId) return null
-  const data = input.data && typeof input.data === 'object' && !Array.isArray(input.data)
-    ? (input.data as EventData)
-    : {}
+  const data = normalizeEventData(input.event, input.data)
+  if (!data) return null
   return {
     event: input.event,
     data,

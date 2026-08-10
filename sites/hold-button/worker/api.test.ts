@@ -105,7 +105,11 @@ describe('hold-button API', () => {
   })
 
   it('POST finish：客户端漂移超过 2.5 秒进入隔离桶（trusted=false）', async () => {
-    const { env } = await makeEnv()
+    const { env, db } = await makeEnv()
+    for (const [nonce, bucket] of [['trusted-1', 10], ['trusted-2', 30]] as const) {
+      await db.prepare('INSERT INTO runs (nonce, day_key, duration_bucket, device_type, trusted, created_at_ms) VALUES (?, ?, ?, ?, ?, ?)')
+        .bind(nonce, '2001-09-09', bucket, 'touch', 1, NOW).run()
+    }
     const { token } = (await (await handleSession(sessionRequest('touch'), env, ctx, NOW)).json()) as {
       token: string
     }
@@ -119,7 +123,8 @@ describe('hold-button API', () => {
       NOW + 20_000,
     )
     expect(response.status).toBe(200)
-    expect((await response.json()) as { trusted: boolean }).toMatchObject({ trusted: false })
+    // 本次不可信，不在 histogram 中，不能再从可信总数扣掉自己。
+    expect((await response.json()) as { trusted: boolean; percentile: number }).toMatchObject({ trusted: false, percentile: 50 })
   })
 
   it('POST finish：服务端时长封顶 20 分钟', async () => {

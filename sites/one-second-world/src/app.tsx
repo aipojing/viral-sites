@@ -36,7 +36,7 @@ export function App(deps: AppDeps = {}) {
   const reducedMotion = useReducedMotion()
   const elapsedMs = useVisibleElapsed({ reducedMotion, ...deps })
 
-  const [sourceFact, setSourceFact] = useState<WorldFact | null>(null)
+  const [source, setSource] = useState<{ fact: WorldFact; frozenElapsedMs: number } | null>(null)
   const [snapshot, setSnapshot] = useState<{
     frozenElapsedMs: number
     facts: readonly [WorldFact, WorldFact, WorldFact]
@@ -65,7 +65,7 @@ export function App(deps: AppDeps = {}) {
 
   const showSource = (fact: WorldFact) => {
     track('source_opened', { source: fact.id })
-    setSourceFact(fact)
+    setSource({ fact, frozenElapsedMs: elapsedRef.current })
   }
 
   // 点击定格时冻结当前有效停留时长，之后背景时钟继续走也不影响快照
@@ -108,8 +108,8 @@ export function App(deps: AppDeps = {}) {
         <p>数据版本 v1 · 最后复核 2026-08-08 · 所有数字为公开统计的均值折算，带「约」语义</p>
         <p>切到后台会暂停计时；刷新页面开始新的一次停留。</p>
       </footer>
-      {sourceFact && (
-        <SourcePanel fact={sourceFact} elapsedMs={elapsedRef.current} onClose={() => setSourceFact(null)} />
+      {source && (
+        <SourcePanel fact={source.fact} elapsedMs={source.frozenElapsedMs} onClose={() => setSource(null)} />
       )}
       {snapshot && (
         <SnapshotBuilder

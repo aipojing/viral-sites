@@ -31,12 +31,11 @@ export async function slugForRequestId(requestId: string): Promise<string> {
   return toBase64Url(new Uint8Array(digest)).slice(0, 16)
 }
 
-// 限流 key 使用 SHA-256(IP + installationId)，绝不把原始 IP 写入存储或日志。
-async function rateLimitKey(request: Request, installationId: string): Promise<string> {
-  const ip = request.headers.get('cf-connecting-ip') ?? ''
+// 限流 key 仅保存 SHA-256 摘要，绝不把原始 IP 写入存储或日志。
+async function rateLimitKey(scope: 'ip' | 'installation', value: string): Promise<string> {
   const digest = await crypto.subtle.digest(
     'SHA-256',
-    new TextEncoder().encode(`${ip}:${installationId}`),
+    new TextEncoder().encode(`next-question:${scope}:${value}`),
   )
   return toBase64Url(new Uint8Array(digest))
 }
@@ -168,9 +167,13 @@ async function handleCreate(request: Request, env: NextQuestionEnv): Promise<Res
 
   const input = parseCreateChainInput(body)
 
-  const key = await rateLimitKey(request, input.installationId)
-  const outcome = await env.NEXT_QUESTION_CREATE_LIMITER.limit({ key })
-  if (!outcome.success) return json(429, { code: 'rate_limited' })
+  const ip = request.headers.get('cf-connecting-ip') ?? ''
+  const ipKey = await rateLimitKey('ip', ip)
+  const installationKey = await rateLimitKey('installation', input.installationId)
+  const ipOutcome = await env.NEXT_QUESTION_CREATE_LIMITER.limit({ key: ipKey })
+  if (!ipOutcome.success) return json(429, { code: 'rate_limited' })
+  const installationOutcome = await env.NEXT_QUESTION_CREATE_LIMITER.limit({ key: installationKey })
+  if (!installationOutcome.success) return json(429, { code: 'rate_limited' })
 
   const slug = await slugForRequestId(input.requestId)
   const stub = env.NEXT_QUESTION_CHAINS.get(env.NEXT_QUESTION_CHAINS.idFromName(slug))

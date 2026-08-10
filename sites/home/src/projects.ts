@@ -86,7 +86,7 @@ export const projects: Project[] = [
     preview: '/previews/ai-judge.avif',
     flavor: 'AI 判词',
     accent: '#b3261e',
-    hero: '/assets/ai-judge-hero-v1.jpg',
+    hero: '/assets/ai-judge-hero-v2.jpg',
   },
   {
     slug: 'next-question',
@@ -97,7 +97,7 @@ export const projects: Project[] = [
     preview: '/previews/next-question.avif',
     flavor: '六人接力',
     accent: '#e63b2e',
-    hero: '/assets/next-question-hero-v1.jpg',
+    hero: '/assets/next-question-hero-v2.jpg',
   },
   {
     slug: 'salary-timer',
@@ -108,7 +108,7 @@ export const projects: Project[] = [
     preview: '/previews/salary-timer.avif',
     flavor: '小票计价',
     accent: '#b8422c',
-    hero: '/assets/salary-timer-hero-v1.jpg',
+    hero: '/assets/salary-timer-hero-v2.jpg',
   },
   {
     slug: 'hold-button',
@@ -119,7 +119,7 @@ export const projects: Project[] = [
     preview: '/previews/hold-button.avif',
     flavor: '耐力挑战',
     accent: '#ffe600',
-    hero: '/assets/hold-button-hero-v1.jpg',
+    hero: '/assets/hold-button-hero-v2.jpg',
   },
   {
     slug: 'one-second-world',
@@ -130,7 +130,7 @@ export const projects: Project[] = [
     preview: '/previews/one-second-world.avif',
     flavor: '数据漫游',
     accent: '#4c8dff',
-    hero: '/assets/one-second-world-hero-v1.jpg',
+    hero: '/assets/one-second-world-hero-v2.jpg',
   },
   {
     slug: 'kinship-calculator',
@@ -141,7 +141,7 @@ export const projects: Project[] = [
     preview: '/previews/kinship-calculator.avif',
     flavor: '春节救急',
     accent: '#c8342b',
-    hero: '/assets/kinship-calculator-hero-v1.jpg',
+    hero: '/assets/kinship-calculator-hero-v2.jpg',
   },
   {
     slug: 'year-report',
@@ -152,7 +152,7 @@ export const projects: Project[] = [
     preview: '/previews/year-report.avif',
     flavor: '年末回顾',
     accent: '#7b5cff',
-    hero: '/assets/year-report-hero-v1.jpg',
+    hero: '/assets/year-report-hero-v2.jpg',
   },
 ]
 

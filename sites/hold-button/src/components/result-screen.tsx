@@ -6,6 +6,7 @@ import { SaveCardButton } from './save-card-button'
 export interface ResultScreenProps {
   durationMs: number
   percentile: number | null
+  percentilePending: boolean
   localOnly: boolean
   todayCount: number
   isNewBest: boolean
@@ -17,6 +18,7 @@ export interface ResultScreenProps {
 export function ResultScreen({
   durationMs,
   percentile,
+  percentilePending,
   localOnly,
   todayCount,
   isNewBest,
@@ -41,6 +43,10 @@ export function ResultScreen({
         <p className="max-w-sm text-sm text-[var(--hb-ink-soft)]" role="status">
           成绩保留在本机。本次没能连上计分服务，不影响你的本机纪录。
         </p>
+      ) : percentilePending ? (
+        <p className="max-w-sm text-sm text-[var(--hb-ink-soft)]" role="status">
+          正在核对今天的成绩分布……
+        </p>
       ) : percentile !== null ? (
         <div className="max-w-sm text-sm" role="status">
           <p>你超过今天 {percentile}% 的参与者</p>
@@ -48,7 +54,7 @@ export function ResultScreen({
         </div>
       ) : (
         <p className="max-w-sm text-sm text-[var(--hb-ink-soft)]" role="status">
-          正在核对今天的成绩分布……
+          你是今天首位完成挑战的人。
         </p>
       )}
 

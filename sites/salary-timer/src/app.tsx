@@ -92,7 +92,7 @@ export function App() {
   const handleStartScene = (scene: SceneId, customLabel?: string) => {
     if (!data || active) return
     try {
-      const fragment = startFragment(scene, now, data.settings, customLabel)
+      const fragment = startFragment(scene, now, data.settings, customLabel, forceWorkday)
       setActive(fragment)
       setLastResult(null)
       // 埋点只带内置场景枚举；custom 不携带任何文本。

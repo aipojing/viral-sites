@@ -90,6 +90,18 @@ describe('App', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
+  it('来源面板冻结在打开时的有效停留时长', () => {
+    render(<App {...deps} />)
+    frame(5_000)
+    fireEvent.click(screen.getAllByRole('button', { name: '查看数据来源' })[0])
+
+    const formulaAtOpen = within(screen.getByRole('dialog')).getByText(/换算式/).textContent
+    expect(formulaAtOpen).toContain('× 5.0')
+
+    frame(9_000)
+    expect(within(screen.getByRole('dialog')).getByText(/换算式/).textContent).toBe(formulaAtOpen)
+  })
+
   it('点击定格这一刻冻结当前有效秒数，时钟继续走也不变', () => {
     render(<App {...deps} />)
     frame(5_000)

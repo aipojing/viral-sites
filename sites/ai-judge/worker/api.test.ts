@@ -63,11 +63,15 @@ function mockProvider(outputs: string[], status = 200): ReturnType<typeof vi.fn>
 }
 
 function fakeGate(behavior: Partial<Record<'authorize' | 'reserveBudget', unknown>> = {}) {
+  const authorize = behavior.authorize instanceof Error
+    ? vi.fn().mockRejectedValue(behavior.authorize)
+    : vi.fn().mockResolvedValue(behavior.authorize ?? { ok: true })
+  const reserveBudget = behavior.reserveBudget instanceof Error
+    ? vi.fn().mockRejectedValue(behavior.reserveBudget)
+    : vi.fn().mockResolvedValue(behavior.reserveBudget ?? { ok: true, reservationId: 'res-1', budgetRatio: 0.01 })
   return {
-    authorize: vi.fn().mockResolvedValue(behavior.authorize ?? { ok: true }),
-    reserveBudget: vi
-      .fn()
-      .mockResolvedValue(behavior.reserveBudget ?? { ok: true, reservationId: 'res-1', budgetRatio: 0.01 }),
+    authorize,
+    reserveBudget,
     settle: vi.fn().mockResolvedValue(undefined),
     cancel: vi.fn().mockResolvedValue(undefined),
   }
@@ -164,6 +168,45 @@ describe('handleVerdictRequest', () => {
     expect(await response.json()).toEqual({ code: 'rate_limited' })
   })
 
+  it('外层限流以服务端匿名 IP 桶计数，换 dailyId 不会绕过', async () => {
+    const limiter = { limit: vi.fn().mockResolvedValue({ success: true }) } as unknown as RateLimit
+    const env = baseEnv({ AI_REQUEST_LIMITER: limiter, AI_LLM_API_KEY: undefined })
+    await handleVerdictRequest(post(verdictBody('阿福', '爱熬夜'), { 'cf-connecting-ip': '203.0.113.8' }), env, ctx)
+    await handleVerdictRequest(
+      post(JSON.stringify({ nickname: '阿福', intro: '爱熬夜', dailyId: '4f2c9a1e-8b4d-4c6e-9f0a-1b2c3d4e5f61' }), {
+        'cf-connecting-ip': '203.0.113.8',
+      }),
+      env,
+      ctx,
+    )
+    const keys = (limiter.limit as ReturnType<typeof vi.fn>).mock.calls.map(([arg]) => arg.key)
+    expect(keys).toHaveLength(2)
+    expect(keys[0]).toBe(keys[1])
+    expect(keys[0]).not.toContain(DAILY_ID)
+  })
+
+  it.each([
+    ['缺少 gate binding', { AI_JUDGE_GATE: undefined }],
+    ['缺少 identity secret', { AI_IDENTITY_SECRET: undefined }],
+  ])('真实 provider 配置时%s关闭法庭且不调用模型', async (_label, overrides) => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    const response = await handleVerdictRequest(post(verdictBody()), baseEnv(overrides), ctx)
+    expect(response.status).toBe(503)
+    expect(await response.json()).toEqual({ code: 'court_closed' })
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it.each(['authorize', 'reserveBudget'] as const)('gate 的 %s 故障时关闭法庭且不调用模型', async (method) => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    const gate = fakeGate({ [method]: new Error('gate unavailable') })
+    const response = await handleVerdictRequest(post(verdictBody()), baseEnv({ AI_JUDGE_GATE: fakeNamespace(gate) }), ctx)
+    expect(response.status).toBe(503)
+    expect(await response.json()).toEqual({ code: 'court_closed' })
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
   it('输入命中禁区：422 case_refused，不调用模型', async () => {
     const fetchMock = vi.fn()
     vi.stubGlobal('fetch', fetchMock)
@@ -221,7 +264,7 @@ describe('handleVerdictRequest', () => {
 
   it('输出越界：不返回模型文本，转 fallback', async () => {
     const fetchMock = mockProvider([JSON.stringify(UNSAFE_VERDICT)])
-    const env = baseEnv()
+    const env = baseEnv({ AI_JUDGE_GATE: fakeNamespace(fakeGate()) })
     const response = await handleVerdictRequest(post(verdictBody()), env, ctx)
     expect(response.status).toBe(200)
     const body = (await response.json()) as VerdictResponse

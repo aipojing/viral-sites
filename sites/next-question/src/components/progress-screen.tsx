@@ -64,13 +64,14 @@ export function ProgressScreen({
   ownerToken?: string
   notice?: string
   onClose?(answer: string): Promise<string | null>
-  onDelete?(): Promise<void>
+  onDelete?(): Promise<string | null>
 }) {
   const [answer, setAnswer] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
   const [shared, setShared] = useState(false)
 
   const entryOf = (slot: number) => chain.entries.find((entry) => entry.slot === slot)
@@ -101,7 +102,12 @@ export function ProgressScreen({
   async function handleDelete() {
     if (deleting || !onDelete) return
     setDeleting(true)
-    await onDelete()
+    setDeleteError(null)
+    const code = await onDelete()
+    if (code) {
+      setDeleteError('删除没有成功，请重试')
+      setDeleting(false)
+    }
   }
 
   return (
@@ -189,6 +195,11 @@ export function ProgressScreen({
           {confirmingDelete ? (
             <div className="flex flex-col gap-3 rounded-xl border border-[#c8392b]/40 bg-[#c8392b]/5 px-4 py-3">
               <p className="text-sm text-stone-700">删除后整条链的问答都会清空，且无法恢复。确定吗？</p>
+              {deleteError ? (
+                <p className="text-sm text-[#c8392b]" role="alert">
+                  {deleteError}
+                </p>
+              ) : null}
               <div className="flex gap-3">
                 <button
                   type="button"

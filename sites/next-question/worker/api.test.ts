@@ -115,10 +115,11 @@ describe('POST /api/next-question/chains', () => {
     expect(result.chain.nextSlot).toBe(2)
     expect(result.ownerToken).toMatch(/^[A-Za-z0-9_-]{43}$/)
     expect(result.batonToken).toMatch(/^[A-Za-z0-9_-]{43}$/)
-    expect(harness.limit).toHaveBeenCalledTimes(1)
-    // 限流 key 绝不能回显原始 IP
-    const key = harness.limit.mock.calls[0][0].key
-    expect(key).not.toContain('203.0.113.7')
+    expect(harness.limit).toHaveBeenCalledTimes(2)
+    // 两个限流 key 都绝不能回显原始 IP。
+    for (const [{ key }] of harness.limit.mock.calls) {
+      expect(key).not.toContain('203.0.113.7')
+    }
   })
 
   it('相同 requestId 幂等：同一 slug、同一结果，不创建第二条链', async () => {
@@ -158,6 +159,19 @@ describe('POST /api/next-question/chains', () => {
     expect(response.status).toBe(429)
     expect(await response.json()).toEqual({ code: 'rate_limited' })
     expect(harness.namespace.instances.size).toBe(0)
+  })
+
+  it('同一 IP 更换 installationId 时仍使用同一个 IP 限流桶', async () => {
+    const harness = makeHarness({ ip: '203.0.113.10' })
+    await createChain(harness, { installationId: crypto.randomUUID() })
+    await createChain(harness, { installationId: crypto.randomUUID() })
+
+    expect(harness.limit).toHaveBeenCalledTimes(4)
+    expect(harness.limit.mock.calls[0][0].key).toBe(harness.limit.mock.calls[2][0].key)
+    expect(harness.limit.mock.calls[1][0].key).not.toBe(harness.limit.mock.calls[3][0].key)
+    for (const [{ key }] of harness.limit.mock.calls) {
+      expect(key).not.toContain('203.0.113.10')
+    }
   })
 
   it('创建接口只接受 POST', async () => {

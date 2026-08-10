@@ -1,7 +1,7 @@
 import { hourlyEquivalent } from './pay-math'
 import type { SalarySettings } from './settings'
-import { paidIntervalsForShift, overlapMs, type TimeInterval } from './work-schedule'
-import { clockOnDate, localDateKey } from './time-local'
+import { overlapMs, todayPayState, type TimeInterval } from './work-schedule'
+import { localDateKey } from './time-local'
 
 export type SceneId = 'meeting' | 'toilet' | 'idle' | 'queue' | 'custom'
 
@@ -61,13 +61,14 @@ export function startFragment(
   now: Date,
   settings: SalarySettings,
   customLabel?: string,
+  forceWorkday = false,
 ): ActiveFragment {
   if (scene === 'custom') {
     const label = normalizeCustomLabel(customLabel ?? '')
     if (label.length === 0) throw new Error('自定义场景必须有名字')
-    return buildFragment(scene, now, settings, label)
+    return buildFragment(scene, now, settings, label, forceWorkday)
   }
-  return buildFragment(scene, now, settings)
+  return buildFragment(scene, now, settings, undefined, forceWorkday)
 }
 
 function buildFragment(
@@ -75,6 +76,7 @@ function buildFragment(
   now: Date,
   settings: SalarySettings,
   customLabel?: string,
+  forceWorkday = false,
 ): ActiveFragment {
   return {
     id: crypto.randomUUID(),
@@ -82,7 +84,7 @@ function buildFragment(
     ...(customLabel !== undefined ? { customLabel } : {}),
     startedAtMs: now.getTime(),
     rateAtStart: hourlyEquivalent(settings),
-    paidIntervalsAtStart: paidIntervalsForShift(settings, clockOnDate(localDateKey(now), 0)),
+    paidIntervalsAtStart: todayPayState(settings, now, forceWorkday).intervals,
     settingsEffectiveFrom: settings.effectiveFrom,
   }
 }

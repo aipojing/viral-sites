@@ -189,13 +189,14 @@ export function App() {
     }
   }, [])
 
-  const handleDelete = useCallback(async (slug: string, token: string): Promise<void> => {
+  const handleDelete = useCallback(async (slug: string, token: string): Promise<string | null> => {
     try {
       await deleteChain(slug, token, crypto.randomUUID())
-    } catch {
-      // 删除失败时保持当前页面；下一问链随后会按保留期清理
+      setState({ screen: 'error', code: 'deleted', slug })
+      return null
+    } catch (error) {
+      return errorCodeOf(error)
     }
-    setState({ screen: 'error', code: 'deleted', slug })
   }, [])
 
   switch (state.screen) {

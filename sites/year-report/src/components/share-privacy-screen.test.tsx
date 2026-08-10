@@ -60,6 +60,8 @@ describe('SharePrivacyScreen', () => {
     expect(screen.getByRole('checkbox', { name: /最难熬的一刻/ })).not.toBeChecked()
     expect(screen.getByText(/建议先问过 TA/)).toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent('会公开 4 项')
+    expect(screen.getByText(/总结卡是摘要/)).toBeInTheDocument()
+    expect(screen.getByText(/完整链接才会包含全部勾选项/)).toBeInTheDocument()
   })
 
   it('未作答的字段不出现在选择列表里', () => {

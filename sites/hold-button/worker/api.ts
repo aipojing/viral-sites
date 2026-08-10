@@ -147,7 +147,7 @@ export async function handleFinish(
   }
   await db.prepare('DELETE FROM sessions WHERE nonce = ?').bind(payload.nonce).run()
 
-  const percentile = await computePercentile(db, dayKey, session.device_type, bucket)
+  const percentile = await computePercentile(db, dayKey, session.device_type, bucket, trusted)
 
   return jsonResponse(200, {
     durationMs: serverDuration,
@@ -157,12 +157,13 @@ export async function handleFinish(
   })
 }
 
-/** 百分位 = 严格低于本桶的人数 / 除自己外的可信人数；自己是当天唯一成绩时返回 null */
+/** 百分位 = 严格低于本桶的人数 / 除自己外的可信人数；不可信成绩不在直方图中。 */
 async function computePercentile(
   db: NonNullable<HoldButtonEnv['HOLD_DB']>,
   dayKey: string,
   deviceType: DeviceType,
   bucket: number,
+  trusted: boolean,
 ): Promise<number | null> {
   const row = await db
     .prepare(
@@ -174,8 +175,8 @@ async function computePercentile(
     )
     .bind(bucket, dayKey, deviceType)
     .first<{ below: number; total: number }>()
-  // 直方图已含本次提交：去掉自己后再算，避免首位参与者得到「超过 0%」
-  const others = Number(row?.total ?? 0) - 1
+  // 仅可信成绩由 trigger 写入直方图，因此只能在本次可信时去掉自己。
+  const others = Number(row?.total ?? 0) - (trusted ? 1 : 0)
   if (others <= 0) return null
   return Math.round((Number(row?.below ?? 0) / others) * 100)
 }

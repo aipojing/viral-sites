@@ -69,7 +69,8 @@ export function SharePrivacyScreen({ year, answers, fields, onToggleField, onBac
     <section className="yr-card">
       <h2 className="yr-card__title">选择要公开的内容</h2>
       <p className="yr-card__note">
-        下面勾上的就是别人能看到的全部内容，图片和链接完全一致。默认只公开四项，敏感的三项默认关着。
+        下面勾上的就是允许公开的内容。总结卡是摘要，版面不足时会优先展示核心条目；
+        完整链接才会包含全部勾选项。默认只公开四项，敏感的三项默认关着。
       </p>
 
       <div role="group" aria-label="公开字段">

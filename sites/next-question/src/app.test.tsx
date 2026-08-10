@@ -407,4 +407,45 @@ describe('删除', () => {
     expect(deleteChain.mock.calls[0][1]).toBe('owner-token-value')
     expect(await screen.findByText(/这条问题不存在/)).toBeInTheDocument()
   })
+
+  it('进度页删除失败时保留页面并提示可重试', async () => {
+    localStorage.setItem(`next-question:owner:${SLUG}`, 'owner-token-value')
+    goTo(`/next-question/c/${SLUG}`)
+    getChain.mockResolvedValue(makeChain('waiting', 3, [makeEntry(1), makeEntry(2)]))
+    deleteChain.mockRejectedValue(new ApiError(500, 'internal_error'))
+    render(<App />)
+
+    const user = userEvent.setup()
+    await user.click(await screen.findByRole('button', { name: /删除这条接力/ }))
+    await user.click(screen.getByRole('button', { name: /确认删除/ }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/删除没有成功，请重试/)
+    expect(screen.getByText(/这个问题正在路上/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /确认删除/ })).toBeEnabled()
+  })
+
+  it('结果页删除失败时保留页面并提示可重试', async () => {
+    localStorage.setItem(`next-question:owner:${SLUG}`, 'owner-token-value')
+    goTo(`/next-question/c/${SLUG}`)
+    getChain.mockResolvedValue(
+      makeChain('completed', null, [
+        makeEntry(1, { answer: '值得。' }),
+        makeEntry(2),
+        makeEntry(3),
+        makeEntry(4),
+        makeEntry(5),
+        makeEntry(6),
+      ]),
+    )
+    deleteChain.mockRejectedValue(new ApiError(500, 'internal_error'))
+    render(<App />)
+
+    const user = userEvent.setup()
+    await user.click(await screen.findByRole('button', { name: /删除这条接力/ }))
+    await user.click(screen.getByRole('button', { name: /确认删除/ }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/删除没有成功，请重试/)
+    expect(screen.getByText(/一个问题走过六个人，又回到了起点/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /确认删除/ })).toBeEnabled()
+  })
 })

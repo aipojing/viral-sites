@@ -30,6 +30,7 @@ export interface AppDeps {
 interface ResultState {
   durationMs: number
   percentile: number | null
+  percentilePending: boolean
   localOnly: boolean
   todayCount: number
   isNewBest: boolean
@@ -91,10 +92,17 @@ export function App({
     if (challengeTarget !== null) {
       track('challenge_finished', { bucket, reason, device: deviceRef.current })
     }
-    setResult({ durationMs, percentile: null, localOnly: false, todayCount: 0, isNewBest: durationMs > previousBest })
+    setResult({
+      durationMs,
+      percentile: null,
+      percentilePending: Boolean(sessionRef.current),
+      localOnly: false,
+      todayCount: 0,
+      isNewBest: durationMs > previousBest,
+    })
 
     const markLocalOnly = () => {
-      if (!destroyedRef.current) setResult((current) => (current ? { ...current, localOnly: true } : current))
+      if (!destroyedRef.current) setResult((current) => (current ? { ...current, localOnly: true, percentilePending: false } : current))
     }
     const sessionPromise = sessionRef.current
     if (!sessionPromise) {
@@ -109,7 +117,14 @@ export function App({
           .then((finish) => {
             if (destroyedRef.current) return
             setResult((current) =>
-              current ? { ...current, percentile: finish.percentile, todayCount: session.todayCount } : current,
+              current
+                ? {
+                    ...current,
+                    percentile: finish.percentile,
+                    percentilePending: false,
+                    todayCount: session.todayCount + (finish.trusted ? 1 : 0),
+                  }
+                : current,
             )
           })
           .catch(markLocalOnly)
@@ -177,6 +192,7 @@ export function App({
       <ResultScreen
         durationMs={result.durationMs}
         percentile={result.percentile}
+        percentilePending={result.percentilePending}
         localOnly={result.localOnly}
         todayCount={result.todayCount}
         isNewBest={result.isNewBest}

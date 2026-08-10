@@ -378,6 +378,25 @@ describe('portal worker entry', () => {
     expect(call.blobs.join('\u0001')).not.toContain('mother>older-brother')
   })
 
+  it('拒绝 query_resolved 携带手机号或答案，且不写入 Analytics Engine', async () => {
+    const { env, writeDataPoint } = makeEnv()
+    const response = await worker.fetch(
+      new Request('https://example.com/api/events', {
+        method: 'POST',
+        body: JSON.stringify({
+          event: 'query_resolved',
+          data: { phone: '13800138000', answer: '你的关系链原文' },
+          path: '/kinship-calculator/',
+          sessionId: 'session-123',
+        }),
+      }),
+      env,
+      ctx,
+    )
+    expect(response.status).toBe(400)
+    expect(writeDataPoint).not.toHaveBeenCalled()
+  })
+
   it('亲戚称呼纠错与反查事件被接受，方式枚举落 method 列', async () => {
     const { env, writeDataPoint } = makeEnv()
     for (const [event, data] of [

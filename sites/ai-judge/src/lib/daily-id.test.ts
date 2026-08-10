@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { dateKeyBeijing, getDailyId } from './daily-id'
 
 beforeEach(() => {
@@ -33,5 +33,12 @@ describe('getDailyId', () => {
     localStorage.setItem('ai_judge_daily_id', '{坏的 JSON')
     expect(() => getDailyId(new Date('2026-08-08T15:30:00Z'))).not.toThrow()
     expect(getDailyId(new Date('2026-08-08T15:30:00Z')).length).toBeGreaterThan(0)
+  })
+
+  it('crypto.randomUUID 不可用时仍生成 RFC4122 UUID', () => {
+    vi.stubGlobal('crypto', { getRandomValues: crypto.getRandomValues.bind(crypto) })
+    const id = getDailyId(new Date('2026-08-08T15:30:00Z'))
+    expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
+    vi.unstubAllGlobals()
   })
 })

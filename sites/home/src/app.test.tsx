@@ -37,20 +37,36 @@ describe('App', () => {
     )
   })
 
-  it('始终把当前选中的卡带滚动到轨道中央', () => {
+  it('只滚动卡带轨道到选中项，不调用会带动根文档的 scrollIntoView', () => {
     const scrollIntoView = vi.fn()
     Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
       configurable: true,
       value: scrollIntoView,
     })
 
-    render(<App />)
-
-    expect(scrollIntoView).toHaveBeenCalledWith({
-      behavior: 'smooth',
-      block: 'nearest',
-      inline: 'center',
+    const { container } = render(<App />)
+    const rail = container.querySelector<HTMLElement>('.cartridge-rail')!
+    const target = screen.getByRole('button', { name: `选择${projects.at(-1)!.title}` })
+    const targetSlot = target.closest<HTMLElement>('.cartridge-slot')!
+    const scrollTo = vi.fn()
+    Object.defineProperties(rail, {
+      clientWidth: { configurable: true, value: 1_000 },
+      scrollWidth: { configurable: true, value: 3_000 },
+      scrollTo: { configurable: true, value: scrollTo },
     })
+    Object.defineProperties(targetSlot, {
+      offsetLeft: { configurable: true, value: 2_500 },
+      offsetWidth: { configurable: true, value: 200 },
+    })
+
+    scrollIntoView.mockClear()
+    fireEvent.click(target)
+
+    expect(scrollTo).toHaveBeenCalledWith({
+      left: 2_000,
+      behavior: 'smooth',
+    })
+    expect(scrollIntoView).not.toHaveBeenCalled()
   })
 
   it('随机选择会轮播后停在抽中的玩法', () => {

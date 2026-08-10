@@ -55,6 +55,13 @@ async function hmacHex(secret: string, message: string): Promise<string> {
     .join('')
 }
 
+/** 边缘限流只使用不可逆 IP 摘要，客户端 dailyId 不能决定桶。 */
+async function rateLimitKey(request: Request): Promise<string> {
+  const ip = request.headers.get('cf-connecting-ip') ?? 'unknown'
+  const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ip))
+  return `ai-judge:ip:${Array.from(new Uint8Array(bytes), (byte) => byte.toString(16).padStart(2, '0')).join('')}`
+}
+
 /** 每日身份 = HMAC(secret, ip|dailyId|dateKey)。只保存摘要，不保存原文。 */
 async function identityHash(request: Request, input: NormalizedJudgeInput, env: AiJudgeEnv): Promise<string> {
   const ip = request.headers.get('cf-connecting-ip') ?? ''
@@ -145,12 +152,18 @@ export async function handleVerdictRequest(
   if (env.AI_REQUEST_LIMITER) {
     try {
       const result = await env.AI_REQUEST_LIMITER.limit({
-        key: `ai-judge:${input.dailyId}`,
+        key: await rateLimitKey(request),
       })
       if (!result.success) return json(429, { code: 'rate_limited' })
     } catch {
       // 限流组件故障不阻断玩法
     }
+  }
+
+  const providerConfigured = Boolean(env.AI_LLM_API_KEY && env.AI_LLM_BASE_URL && env.AI_LLM_MODEL)
+  // 真实调用绝不绕过次数/预算闸门；只有未配 provider 的开发态允许 fallback。
+  if (providerConfigured && (!env.AI_JUDGE_GATE || !env.AI_IDENTITY_SECRET)) {
+    return json(503, { code: 'court_closed' })
   }
 
   const gateNamespace = env.AI_JUDGE_GATE
@@ -163,7 +176,8 @@ export async function handleVerdictRequest(
       const authorized = await stub.authorize(await identityHash(request, input, env))
       if (!authorized.ok) return json(429, { code: 'rate_limited' })
     } catch {
-      gate = undefined // DO 故障时降级为无次数限制，预算与模型仍受其他闸控制
+      if (providerConfigured) return json(503, { code: 'court_closed' })
+      gate = undefined
     }
   }
 
@@ -182,7 +196,6 @@ export async function handleVerdictRequest(
     }
   }
 
-  const providerConfigured = Boolean(env.AI_LLM_API_KEY && env.AI_LLM_BASE_URL && env.AI_LLM_MODEL)
   if (!providerConfigured) {
     // 开发态/未配置模型：明确降级到审核过的兜底判词，不伪造 AI 结果
     const response: VerdictResponse = { verdict: fallbackVerdict(input), source: 'fallback' }
@@ -199,7 +212,7 @@ export async function handleVerdictRequest(
       if (!reserved.ok) return json(503, { code: 'court_closed' })
       reservationId = reserved.reservationId
     } catch {
-      reservationId = null
+      return json(503, { code: 'court_closed' })
     }
   }
 

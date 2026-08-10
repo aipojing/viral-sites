@@ -219,14 +219,17 @@ export function App({ random = Math.random }: AppProps) {
   )
 
   useEffect(() => {
-    const selectedCard = railRef.current?.querySelector<HTMLElement>(
+    const rail = railRef.current
+    const selectedCard = rail?.querySelector<HTMLElement>(
       `[data-project-slug="${highlightedSlug}"]`,
     )
-    if (typeof selectedCard?.scrollIntoView === 'function') {
-      selectedCard.scrollIntoView({
+    const selectedSlot = selectedCard?.closest<HTMLElement>('.cartridge-slot')
+    if (rail && selectedSlot && typeof rail.scrollTo === 'function') {
+      const centeredLeft = selectedSlot.offsetLeft - (rail.clientWidth - selectedSlot.offsetWidth) / 2
+      const maxLeft = Math.max(0, rail.scrollWidth - rail.clientWidth)
+      rail.scrollTo({
+        left: Math.max(0, Math.min(centeredLeft, maxLeft)),
         behavior: isShuffling ? 'auto' : 'smooth',
-        block: 'nearest',
-        inline: 'center',
       })
     }
   }, [highlightedSlug, isShuffling])
